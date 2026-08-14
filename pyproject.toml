@@ -1,3 +1,7 @@
+[project]
+name = "simple-zfs-manager"
+version = "0.0.0"
+
 [tool.setuptools.packages.find]
 where = ["."]
 
