@@ -1,0 +1,30 @@
+name: Test App
+
+on:
+  push:
+
+jobs:
+  test_python:
+    runs-on: ubuntu-26.04-arm
+    
+    steps:
+    - uses: actions/checkout@v6
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.14'
+        cache: 'pip'
+    - name: Install Pip Packages
+      run: |
+        pip3 install -r requirements.txt
+        pip3 install -e .
+    - name: Run Tests
+      run: |
+        coverage run -m pytest
+        coverage html
+    - name: Upload code coverage results
+      uses: actions/upload-artifact@v7
+      with:
+        name: code-coverage-report-python-test
+        path: htmlcov
+        retention-days: 7

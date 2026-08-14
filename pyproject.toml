@@ -1,0 +1,6 @@
+[project]
+name = "simple-zfs-manager"
+version = "0.0.0"
+
+[pytest]
+pythonpath = ["."]
