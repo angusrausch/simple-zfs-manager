@@ -1,14 +1,12 @@
-import os
+# app/main.py
 import uvicorn
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.routers import health
-from app.routers import dashboard
-load_dotenv()
+from app.core.config import settings
+from app.routers import health, dashboard
 
-app = FastAPI(title="Simple ZFS Manager")
+app = FastAPI(title=settings.PROJECT_NAME)
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
@@ -19,6 +17,6 @@ if __name__ == "__main__":
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
-        port=int(os.getenv("PORT", 8080)),
-        reload=True,
+        port=settings.PORT,
+        reload=settings.DEBUG,
     )
