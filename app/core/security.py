@@ -6,14 +6,11 @@ from app.core.config import settings
 ALGORITHM = "HS256"
 COOKIE_NAME = "access_token"
 
-async def get_current_user(request: Request):
+async def _decode_token(request: Request):
     token = request.cookies.get(COOKIE_NAME)
     
     if not token:
-        raise HTTPException(
-            status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-            headers={"Location": "/login"}
-        )
+        return None
         
     try:
         payload = jwt.decode(
@@ -25,11 +22,19 @@ async def get_current_user(request: Request):
         
         uid_str = payload.get("sub")
         if uid_str is None:
-            raise HTTPException(status_code=status.HTTP_307_TEMPORARY_REDIRECT, headers={"Location": "/login"})
+            return None
             
         return int(uid_str)
-        
-    except jwt.ExpiredSignatureError:
+    except (jwt.jwt.ExpiredSignatureError, jwt.PyJWTError, ValueError):
+        return None
+
+async def get_current_user(request: Request):
+    uid = await _decode_token(request)
+
+    if uid is None:
         raise HTTPException(status_code=status.HTTP_307_TEMPORARY_REDIRECT, headers={"Location": "/login"})
-    except (jwt.PyJWTError, ValueError) as e:
-        raise HTTPException(status_code=status.HTTP_307_TEMPORARY_REDIRECT, headers={"Location": "/login"})
+    
+    return uid
+
+async def user_logged_in(request: Request):
+    return await _decode_token(request) is not None

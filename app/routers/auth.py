@@ -8,7 +8,7 @@ from fastapi.responses import RedirectResponse
 from app.core.system.pam_auth import get_authenticated_uid
 from app.utils.sanitise import sanitize_username
 from app.core.config import settings
-from app.core.security import ALGORITHM, COOKIE_NAME
+from app.core.security import ALGORITHM, COOKIE_NAME, user_logged_in
 from app.core.errors import InvalidCredentialsError
 from app.core.templates import templates
 
@@ -17,10 +17,16 @@ router = APIRouter()
 
 @router.get("/login")
 async def read_login(request: Request):
-    return templates.TemplateResponse(
-        request, 
-        "login.html"
-    )
+    if await user_logged_in(request):
+        return RedirectResponse(
+            url="/",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+    else:
+        return templates.TemplateResponse(
+            request, 
+            "login.html"
+        )
 
 @router.post("/login")
 async def create_login(
