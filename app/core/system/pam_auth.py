@@ -3,6 +3,8 @@ import pwd
 from fastapi.concurrency import run_in_threadpool
 from fastapi import HTTPException, status
 
+from app.core.errors import InvalidCredentialsError
+
 def _sync_pam_uid_lookup(username: str, password: str) -> int:
     p = pam.pam()
     if p.authenticate(username, password):
@@ -16,9 +18,6 @@ async def get_authenticated_uid(username: str, password: str) -> int:
     uid = await run_in_threadpool(_sync_pam_uid_lookup, username, password)
 
     if uid == -1:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication failed or invalid system user."
-        )
+        raise InvalidCredentialsError()
 
     return uid
