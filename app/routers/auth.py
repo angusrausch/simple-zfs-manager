@@ -67,3 +67,17 @@ async def create_login(
         samesite="strict"
     )
     return response
+
+@router.post("/logout")
+async def create_logout(request: Request):
+    response = RedirectResponse(
+        url="/login",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+    response.delete_cookie(
+        key=COOKIE_NAME,
+        httponly=True,
+        samesite="strict"
+    )
+
+    return response
