@@ -25,7 +25,7 @@ async def _decode_token(request: Request):
             return None
             
         return int(uid_str)
-    except (jwt.jwt.ExpiredSignatureError, jwt.PyJWTError, ValueError):
+    except (jwt.ExpiredSignatureError, jwt.PyJWTError, ValueError):
         return None
 
 async def get_current_user(request: Request):
