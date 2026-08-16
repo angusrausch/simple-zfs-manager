@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 import logging
 
 from app.core.config import settings
-from app.routers import health, dashboard
+
 from app.routers import health, dashboard, auth
 from app.core.system.logger import setup_logging
 
