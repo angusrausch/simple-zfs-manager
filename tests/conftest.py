@@ -1,6 +1,15 @@
 import pytest
+import os
+import sys
+import shutil
+from pathlib import Path
 from unittest.mock import patch
 from fastapi.testclient import TestClient
+
+current_dir = Path.cwd()
+sys.path.insert(0, str(current_dir))
+log_location = current_dir / "tests/log/app.log"
+os.environ["LOG_LOCATION"] = str(log_location)
 
 from app.main import app
 from app.core.security import get_current_user
@@ -25,3 +34,10 @@ def authenticated_client(client):
         yield client
 
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(scope="session")
+def create_log_dir():
+    log_location.parent.mkdir(exist_ok=True)
+    yield
+    shutil.rmtree(log_location.parent)
