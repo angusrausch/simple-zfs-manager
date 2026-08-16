@@ -5,15 +5,13 @@ from fastapi.responses import RedirectResponse
 
 from app.core.config import settings
 from app.core.system.pam_auth import get_authenticated_uid
-from app.utils.sanitise import sanitize_username
+from app.utils.sanitise import sanitise_username
 
 ALGORITHM = "HS256"
 COOKIE_NAME = "access_token"
 
 
-async def _decode_token(request: Request) -> int:
-    token = request.cookies.get(COOKIE_NAME)
-    
+async def _decode_token(token: str) -> int:
     if not token:
         return None
         
@@ -26,7 +24,7 @@ async def _decode_token(request: Request) -> int:
         )
         
         uid_str = payload.get("sub")
-        if uid_str is None:
+        if uid_str is None or uid_str == "":
             return None
             
         return int(uid_str)
@@ -35,7 +33,8 @@ async def _decode_token(request: Request) -> int:
 
 
 async def get_current_user(request: Request):
-    uid = await _decode_token(request)
+    token = request.cookies.get(COOKIE_NAME)
+    uid = await _decode_token(token)
 
     if uid is None:
         raise HTTPException(status_code=status.HTTP_307_TEMPORARY_REDIRECT, headers={"Location": "/login"})
@@ -44,7 +43,8 @@ async def get_current_user(request: Request):
 
 
 async def user_logged_in(request: Request) -> bool:
-    return await _decode_token(request) is not None
+    token = request.cookies.get(COOKIE_NAME)
+    return await _decode_token(token) is not None
 
 
 def create_token(uid) -> str:
@@ -54,6 +54,6 @@ def create_token(uid) -> str:
 
 
 async def create_login_token(username: str, password: str) -> str:
-    sanitize_username(username)
+    sanitise_username(username)
     uid = await get_authenticated_uid(username, password)
     return create_token(uid)

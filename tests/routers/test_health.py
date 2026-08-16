@@ -1,4 +1,4 @@
-def test_get_google_maps_key(client):
+def test_read_health(client):
     response = client.get('/health')
     assert response.status_code == 200
     data = response.json()
