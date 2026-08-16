@@ -1,9 +1,8 @@
-# tests/test_pam_auth.py
 import pytest
 from unittest.mock import MagicMock, patch
-from fastapi import HTTPException
 
 from app.core.system.pam_auth import get_authenticated_uid
+from app.core.errors import InvalidCredentialsError
 
 @pytest.mark.asyncio
 @patch("app.core.system.pam_auth.pwd.getpwnam")
@@ -31,11 +30,10 @@ async def test_failed_authentication(mock_pam_class):
     mock_pam_instance.authenticate.return_value = False
     mock_pam_class.return_value = mock_pam_instance
 
-    with pytest.raises(HTTPException) as exc_info:
+    with pytest.raises(InvalidCredentialsError) as exc_info:
         await get_authenticated_uid("validuser", "wrongpassword")
-        
-    assert exc_info.value.status_code == 401
-    assert "Authentication failed" in exc_info.value.detail
+
+    assert "Incorrect username or password" in str(exc_info.value)
 
 
 @pytest.mark.asyncio
@@ -48,7 +46,7 @@ async def test_pam_succeeds_but_user_missing_in_pwd(mock_pam_class, mock_getpwna
     
     mock_getpwnam.side_effect = KeyError("user not found")
 
-    with pytest.raises(HTTPException) as exc_info:
+    with pytest.raises(InvalidCredentialsError) as exc_info:
         await get_authenticated_uid("weirduser", "password")
 
-    assert exc_info.value.status_code == 401
+    assert "Incorrect username or password" in str(exc_info.value)
