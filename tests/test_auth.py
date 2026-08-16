@@ -59,6 +59,11 @@ def test_read_login(client):
     assert response.status_code == 200
 
 
+def test_read_login_authenticated(authenticated_client):
+    response = authenticated_client.get('/login', follow_redirects=False)
+    assert response.status_code == 303
+
+
 def test_post_login_success(client):
     with patch("app.core.system.pam_auth.pam.pam") as mock_pam_class, \
          patch("app.core.system.pam_auth.pwd.getpwnam") as mock_getpwnam:
@@ -116,3 +121,19 @@ def test_post_login_fail_format(client):
     
     assert response.status_code == 400
     assert str(InvalidUsernameFormatError()) in response.text
+
+
+def test_post_logout_unauthenticated(client):
+    client.cookies.clear() 
+
+    response = client.post('/logout', follow_redirects=False)
+    
+    assert response.status_code == 307
+    assert response.headers["Location"] == "/login"
+    
+
+def test_logout_authenticated(authenticated_client):
+    response = authenticated_client.post('/logout', follow_redirects=False)
+    
+    assert response.status_code == 303
+    assert response.headers["Location"] == "/login"
