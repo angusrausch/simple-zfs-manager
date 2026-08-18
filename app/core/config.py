@@ -19,5 +19,9 @@ class Settings:
     SUDO_BINARY: str = os.getenv("SUDO_BINARY_PATH", "/usr/bin/sudo")
     
     LOG_LOCATION: Path = Path(os.getenv("LOG_LOCATION", "/var/log/simple-zfs-viewer.log"))
+    LOG_LOCATION.parent.mkdir(parents=True, exist_ok=True)
+
+    LOCK_FILE_PATH: Path = Path(os.getenv("LOCK_FILE_PATH", "/var/lib/simple-zfs-manager/locks")).absolute()
+    LOCK_FILE_PATH.mkdir(parents=True, exist_ok=True)
 
 settings = Settings()
