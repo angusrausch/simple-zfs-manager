@@ -219,3 +219,6 @@ __marimo__/
 
 # NPM
 **node_modules/
+
+# Working dir lock files
+lock/
