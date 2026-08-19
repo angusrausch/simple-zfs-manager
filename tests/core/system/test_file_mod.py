@@ -1,10 +1,11 @@
 import pytest
-from pathlib import Path
 import os
 import stat
+from pathlib import Path
 from unittest.mock import patch, mock_open
+from collections import Counter
 
-from app.core.system.file_mod import verify_file_integrity, _safe_write, write_file, _find_lock_path
+from app.core.system.file_mod import verify_file_integrity, _safe_write, write_file, _find_lock_path, check_all_locks
 from app.core.errors import MissingInputFileError, LockFileMismatchError, LockPathBlockedError, PathBlockedError, CannotWriteError
 
 
@@ -168,7 +169,7 @@ def test_write_file_previous_file(create_lock_dir):
 def test_write_file_folder_exists(create_lock_dir, caplog):
     test_file_path = create_lock_dir / "test_write_file_folder_exists"
 
-    test_file_path.mkdir(parents=True)
+    test_file_path.mkdir(parents=True, exist_ok=True)
 
     with pytest.raises(PathBlockedError) as e:
         write_file(test_file_path, "")
@@ -327,3 +328,67 @@ def test_write_file_previous_file_change_contents(create_lock_dir, caplog):
     assert f"File verification failed on file {test_file_path}" in str(e.value)
 
     assert f"File verification failed on file {test_file_path}" in caplog.text
+
+
+def test_check_all_locks(create_lock_dir):
+    for i in range(10):
+        test_file_path = create_lock_dir / f"file_number_{i}"
+        write_file(test_file_path, str(test_file_path))
+
+    failed_lock_checks = check_all_locks()
+
+    assert len(failed_lock_checks) == 0
+
+
+def test_check_all_locks_change_original(create_lock_dir):
+    for i in range(10):
+        test_file_path = create_lock_dir / f"file_number_{i}"
+        write_file(test_file_path, str(test_file_path))
+
+    failed_test_files = []
+    for i in (1,4,6,7):
+        test_file_path = create_lock_dir / f"file_number_{i}"
+        failed_test_files.append(test_file_path)
+        with open(test_file_path, 'w', encoding="utf-8") as test_file:
+            test_file.write("does not match")
+
+    failed_lock_checks = check_all_locks()
+
+    assert len(failed_lock_checks) == 4
+    assert Counter(failed_lock_checks) == Counter(failed_test_files)
+
+
+def test_check_all_locks_change_lock(create_lock_dir):
+    for i in range(10):
+        test_file_path = create_lock_dir / f"file_number_{i}"
+        write_file(test_file_path, str(test_file_path))
+
+    failed_test_files = []
+    for i in (1,4,6,7):
+        test_file_path = create_lock_dir / f"file_number_{i}"
+        failed_test_files.append(test_file_path)
+        test_file_lock_path = _find_lock_path(test_file_path)
+        with open(test_file_lock_path, 'w', encoding="utf-8") as test_file:
+            test_file.write("does not match")
+
+    failed_lock_checks = check_all_locks()
+
+    assert len(failed_lock_checks) == 4
+    assert Counter(failed_lock_checks) == Counter(failed_test_files)
+
+
+def test_check_all_locks_deleted_file(create_lock_dir):
+    for i in range(10):
+        test_file_path = create_lock_dir / f"file_number_{i}"
+        write_file(test_file_path, str(test_file_path))
+
+    failed_test_files = []
+    for i in (1,4,6,7):
+        test_file_path = create_lock_dir / f"file_number_{i}"
+        failed_test_files.append(test_file_path)
+        test_file_path.unlink()
+
+    failed_lock_checks = check_all_locks()
+
+    assert len(failed_lock_checks) == 4
+    assert Counter(failed_lock_checks) == Counter(failed_test_files)

@@ -10,7 +10,7 @@ current_dir = Path.cwd()
 sys.path.insert(0, str(current_dir))
 log_location = current_dir / "tests/log/app.log"
 os.environ["LOG_LOCATION"] = str(log_location)
-lock_file_path = current_dir / "tests/lock"
+lock_file_path = current_dir / "tests/lock-tests/lock"
 os.environ["LOCK_FILE_PATH"] = str(lock_file_path)
 
 from app.main import app
@@ -45,8 +45,8 @@ def create_log_dir():
     shutil.rmtree(log_location.parent)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def create_lock_dir():
-    lock_file_path.mkdir(exist_ok=True)
-    yield lock_file_path
-    shutil.rmtree(lock_file_path)
+    lock_file_path.mkdir(parents=True, exist_ok=True)
+    yield lock_file_path.parent
+    shutil.rmtree(lock_file_path.parent)

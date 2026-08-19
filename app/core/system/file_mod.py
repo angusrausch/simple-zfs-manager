@@ -70,6 +70,20 @@ def write_file(file_path: Path, contents: str):
     verify_file_integrity(file_path)
 
 
+def check_all_locks() -> [Path]:
+    mismatch_files = []
+    for lock_file in settings.LOCK_FILE_PATH.rglob("*"):
+        if lock_file.is_file():
+            real_file = Path("/") / lock_file.relative_to(settings.LOCK_FILE_PATH)
+
+            try:
+                verify_file_integrity(real_file)
+            except (MissingInputFileError, LockFileMismatchError, LockPathBlockedError):
+                mismatch_files.append(real_file)
+
+    return mismatch_files
+
+
 def _find_lock_path(file_path: Path) -> Path:
     abs_file_path = file_path.resolve()
     return settings.LOCK_FILE_PATH / abs_file_path.relative_to(abs_file_path.anchor)
