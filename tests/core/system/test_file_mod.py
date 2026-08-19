@@ -1,14 +1,16 @@
 import pytest
 from pathlib import Path
+import os
+import stat
 from unittest.mock import patch, mock_open
 
-from app.core.system.file_mod import verify_file_integrity, _safe_write
-from app.core.errors import MissingInputFileError, LockFileMismatchError, LockPathBlockedError
+from app.core.system.file_mod import verify_file_integrity, _safe_write, write_file, _find_lock_path
+from app.core.errors import MissingInputFileError, LockFileMismatchError, LockPathBlockedError, PathBlockedError, CannotWriteError
 
 
 def test_file_verification(create_lock_dir):
     test_file_path = create_lock_dir / "test_file_verification"
-    test_lock_file_path = create_lock_dir / test_file_path.relative_to(test_file_path.anchor)
+    test_lock_file_path = _find_lock_path(test_file_path)
     
     with open(test_file_path, 'w') as test_file:
         test_file.write("this should match")
@@ -22,8 +24,8 @@ def test_file_verification(create_lock_dir):
 
 def test_file_verification_no_match(create_lock_dir, caplog):
     test_file_path = create_lock_dir / "test_file_verification_no_match"
-    test_lock_file_path = create_lock_dir / test_file_path.relative_to(test_file_path.anchor)
-    
+    test_lock_file_path = _find_lock_path(test_file_path)
+
     with open(test_file_path, 'w') as test_file:
         test_file.write("this should not match")
 
@@ -41,7 +43,7 @@ def test_file_verification_no_match(create_lock_dir, caplog):
 
 def test_file_verification_create_file(create_lock_dir, caplog):
     test_file_path = create_lock_dir / "test_file_verification_create_file"
-    test_lock_file_path = create_lock_dir / test_file_path.relative_to(test_file_path.anchor)
+    test_lock_file_path = _find_lock_path(test_file_path)
     
     with open(test_file_path, 'w') as test_file:
         test_file.write("this should match")
@@ -59,7 +61,7 @@ def test_file_verification_create_file(create_lock_dir, caplog):
 
 def test_file_verification_folder_exists(create_lock_dir, caplog):
     test_file_path = create_lock_dir / "test_file_verification_folder_exists"
-    test_lock_file_path = create_lock_dir / test_file_path.relative_to(test_file_path.anchor)
+    test_lock_file_path = _find_lock_path(test_file_path)
     
     with open(test_file_path, 'w') as test_file:
         test_file.write("this should match")
@@ -129,3 +131,198 @@ def test_safe_write_metadata_phase_failure(mock_replace, tmp_path):
     
     with pytest.raises(PermissionError):
         _safe_write(target_file, "some data")
+
+
+def test_write_file(create_lock_dir):
+    test_file_path = create_lock_dir / "test_write_file"
+    contents = "this should be in file"
+
+    write_file(test_file_path, contents)
+
+    with open(test_file_path, 'r', encoding="utf-8") as test_file:
+        assert contents in test_file.read() 
+
+    verify_file_integrity(test_file_path)
+
+
+def test_write_file_previous_file(create_lock_dir):
+    test_file_path = create_lock_dir / "test_write_file_previous_file"
+    old_contents = "this used to be in file"
+
+    with open(test_file_path, 'w', encoding="utf-8") as test_file:
+        test_file.write(old_contents)
+
+    new_contents = "this is now in the file"
+
+    write_file(test_file_path, new_contents)
+
+    with open(test_file_path, 'r', encoding="utf-8") as test_file:
+        file_contents = test_file.read() 
+
+    assert old_contents not in file_contents
+    assert new_contents in file_contents
+
+    verify_file_integrity(test_file_path)
+
+
+def test_write_file_folder_exists(create_lock_dir, caplog):
+    test_file_path = create_lock_dir / "test_write_file_folder_exists"
+
+    test_file_path.mkdir(parents=True)
+
+    with pytest.raises(PathBlockedError) as e:
+        write_file(test_file_path, "")
+
+    assert f"File write found folder exists at {test_file_path}, this should be a file" in str(e.value)
+
+    assert f"[FILE] File write found folder exists at {test_file_path}, this should be a file" in caplog.text
+
+
+def test_write_file_cannot_write_lock_file_file_exists(create_lock_dir, caplog):
+    test_file_path = create_lock_dir / "locked/test_write_file_cannot_write_lock_file_file_exists"
+    test_lock_file_path = _find_lock_path(test_file_path)
+    old_contents = "this used to be in file"
+
+    write_file(test_file_path, old_contents)
+
+    lock_dir = test_lock_file_path.parent
+    os.chmod(lock_dir, stat.S_IRUSR | stat.S_IXUSR)
+
+    new_contents = "this is now in the file"
+
+    try:
+        with pytest.raises(CannotWriteError) as e:
+            write_file(test_file_path, new_contents)
+        
+        with open(test_file_path, 'r', encoding="utf-8") as test_file:
+            file_contents = test_file.read()
+
+        assert old_contents in file_contents
+        assert new_contents not in file_contents
+
+        assert f"[FILE] Failed to write file {test_lock_file_path}" in caplog.text
+    finally:
+        os.chmod(lock_dir, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+
+
+def test_write_file_cannot_write_lock_file(create_lock_dir, caplog):
+    test_file_path = create_lock_dir / "locked/test_write_file_cannot_write_lock_file"
+    test_lock_file_path = _find_lock_path(test_file_path)
+
+    lock_dir = test_lock_file_path.parent
+    lock_dir.mkdir(exist_ok=True)
+    test_lock_file_path.touch()
+    os.chmod(lock_dir, stat.S_IRUSR | stat.S_IXUSR)
+
+    new_contents = "this is in the file"
+
+    try:
+        with pytest.raises(CannotWriteError) as e:
+            write_file(test_file_path, new_contents)
+        
+        assert not test_file_path.exists()
+
+        assert f"[FILE] Failed to write file {test_lock_file_path}" in caplog.text
+    finally:
+        os.chmod(lock_dir, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+
+
+def test_write_file_cannot_write_lock_file_folder_exists(create_lock_dir, caplog):
+    test_file_path = create_lock_dir / "test_write_file_cannot_write_lock_file_folder_exists"
+    test_lock_file_path = _find_lock_path(test_file_path)
+
+    test_lock_file_path.mkdir(parents=True, exist_ok=True)
+
+    new_contents = "this is in the file"
+
+    with pytest.raises(CannotWriteError) as e:
+        write_file(test_file_path, new_contents)
+        
+        assert not test_file_path.exists()
+
+        assert f"[FILE] Failed to write file {test_lock_file_path}" in caplog.text
+
+
+def test_write_file_cannot_write_file_file_exists(create_lock_dir, caplog):
+    test_file_path = create_lock_dir / "locked/test_write_file_cannot_write_lock_file_file_exists"
+    test_lock_file_path = _find_lock_path(test_file_path)
+    old_contents = "this used to be in file"
+
+    write_file(test_file_path, old_contents)
+
+    file_dir = test_file_path.parent
+    os.chmod(file_dir, stat.S_IRUSR | stat.S_IXUSR)
+
+    new_contents = "this is now in the file"
+
+    try:
+        with pytest.raises(CannotWriteError) as e:
+            write_file(test_file_path, new_contents)
+        
+        with open(test_file_path, 'r', encoding="utf-8") as test_file:
+            file_contents = test_file.read()
+
+        assert old_contents in file_contents
+        assert new_contents not in file_contents
+
+        assert f"[FILE] Failed to write file {test_file_path}" in caplog.text
+    finally:
+        os.chmod(file_dir, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+
+
+def test_write_file_cannot_write_file(create_lock_dir, caplog):
+    test_file_path = create_lock_dir / "locked/test_write_file_cannot_write_lock_file"
+    test_lock_file_path = _find_lock_path(test_file_path)
+
+    file_dir = test_file_path.parent
+    file_dir.mkdir(exist_ok=True)
+    test_lock_file_path.touch()
+    os.chmod(file_dir, stat.S_IRUSR | stat.S_IXUSR)
+
+    new_contents = "this is in the file"
+
+    try:
+        with pytest.raises(CannotWriteError) as e:
+            write_file(test_file_path, new_contents)
+        
+        assert not test_file_path.exists()
+
+        assert f"[FILE] Failed to write file {test_file_path}" in caplog.text
+    finally:
+        os.chmod(file_dir, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+
+
+def test_write_file_cannot_write_file_folder_exists(create_lock_dir, caplog):
+    test_file_path = create_lock_dir / "test_write_file_cannot_write_lock_file_folder_exists"
+    test_lock_file_path = _find_lock_path(test_file_path)
+
+    test_file_path.mkdir(parents=True, exist_ok=True)
+
+    new_contents = "this is in the file"
+
+    with pytest.raises(PathBlockedError) as e:
+        write_file(test_file_path, new_contents)
+        
+        assert not test_file_path.exists()
+
+        assert f"[FILE] Failed to write file {test_file_path}" in caplog.text
+
+
+def test_write_file_previous_file_change_contents(create_lock_dir, caplog):
+    test_file_path = create_lock_dir / "test_write_file_previous_file"
+    old_contents = "this used to be in file"
+
+    write_file(test_file_path, old_contents)
+
+    incorrect_contents = "this shouldn't be in file"
+    with open(test_file_path, 'w', encoding="utf-8") as test_file:
+        test_file.write(incorrect_contents)
+
+    new_contents = "this is now in the file"
+
+    with pytest.raises(LockFileMismatchError) as e:
+        write_file(test_file_path, new_contents)
+
+    assert f"File verification failed on file {test_file_path}" in str(e.value)
+
+    assert f"File verification failed on file {test_file_path}" in caplog.text

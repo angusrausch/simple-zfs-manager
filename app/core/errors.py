@@ -25,3 +25,5 @@ class FileIntegrityError(Exception):
 class MissingInputFileError(FileIntegrityError): pass
 class LockFileMismatchError(FileIntegrityError): pass
 class LockPathBlockedError(FileIntegrityError): pass
+class PathBlockedError(FileIntegrityError): pass
+class CannotWriteError(FileIntegrityError): pass
