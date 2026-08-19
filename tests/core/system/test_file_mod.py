@@ -210,7 +210,7 @@ def test_write_file_cannot_write_lock_file(create_lock_dir, caplog):
     test_lock_file_path = _find_lock_path(test_file_path)
 
     lock_dir = test_lock_file_path.parent
-    lock_dir.mkdir(exist_ok=True)
+    lock_dir.mkdir(exist_ok=True, parents=True)
     test_lock_file_path.touch()
     os.chmod(lock_dir, stat.S_IRUSR | stat.S_IXUSR)
 
@@ -244,7 +244,7 @@ def test_write_file_cannot_write_lock_file_folder_exists(create_lock_dir, caplog
 
 
 def test_write_file_cannot_write_file_file_exists(create_lock_dir, caplog):
-    test_file_path = create_lock_dir / "locked/test_write_file_cannot_write_lock_file_file_exists"
+    test_file_path = create_lock_dir / "locked/test_write_file_cannot_write_file_file_exists"
     test_lock_file_path = _find_lock_path(test_file_path)
     old_contents = "this used to be in file"
 
@@ -271,21 +271,22 @@ def test_write_file_cannot_write_file_file_exists(create_lock_dir, caplog):
 
 
 def test_write_file_cannot_write_file(create_lock_dir, caplog):
-    test_file_path = create_lock_dir / "locked/test_write_file_cannot_write_lock_file"
+    test_file_path = create_lock_dir / "locked/test_write_file_cannot_write_file"
     test_lock_file_path = _find_lock_path(test_file_path)
 
     file_dir = test_file_path.parent
-    file_dir.mkdir(exist_ok=True)
-    test_lock_file_path.touch()
+    file_dir.mkdir(exist_ok=True, parents=True)
+    test_file_path.touch()
     os.chmod(file_dir, stat.S_IRUSR | stat.S_IXUSR)
 
-    new_contents = "this is in the file"
+    new_contents = "this is not in the file"
 
     try:
         with pytest.raises(CannotWriteError) as e:
             write_file(test_file_path, new_contents)
         
-        assert not test_file_path.exists()
+        with open(test_file_path, 'r', encoding="utf-8") as test_file:
+            assert "this is not in the file" not in test_file.read()
 
         assert f"[FILE] Failed to write file {test_file_path}" in caplog.text
     finally:
@@ -293,7 +294,7 @@ def test_write_file_cannot_write_file(create_lock_dir, caplog):
 
 
 def test_write_file_cannot_write_file_folder_exists(create_lock_dir, caplog):
-    test_file_path = create_lock_dir / "test_write_file_cannot_write_lock_file_folder_exists"
+    test_file_path = create_lock_dir / "test_write_file_cannot_write_file_folder_exists"
     test_lock_file_path = _find_lock_path(test_file_path)
 
     test_file_path.mkdir(parents=True, exist_ok=True)
