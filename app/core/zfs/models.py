@@ -24,3 +24,8 @@ class PoolState(BaseModel):
     checksum_errors: int = 0
     
     vdev_tree: Optional[VDevNode] = None
+
+class ImportablePools(BaseModel):
+    name: str
+    id: int
+    healthy: bool

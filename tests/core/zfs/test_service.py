@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, _build_pool_state, _execute_zpool_command
-from app.core.zfs.models import PoolState
+from app.core.zfs.models import PoolState, ImportablePools
 
 
 def test_build_pool_state_from_list():
@@ -181,9 +181,33 @@ async def test_get_importable_pools(mock_run_command, load_cmd_json_fixture):
     importable_pools = await get_importable_pools(1000)
 
     assert importable_pools == [
-        ("fish", True),
-        ("tank", True)
+        ImportablePools(name="fish", id=1123, healthy=True),
+        ImportablePools(name="tank", id=1234, healthy=False)
     ]
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_get_importable_pools_no_id(mock_run_command, load_cmd_json_fixture, caplog):
+    mock_run_command.return_value = (0, load_cmd_json_fixture)
+
+    with pytest.raises(AttributeError) as e:
+        importable_pools = await get_importable_pools(1000)
+
+    assert "No id field in zpool import" in str(e.value)
+    assert "No id field in zpool import" in caplog.text
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_get_importable_pools_char_id(mock_run_command, load_cmd_json_fixture, caplog):
+    mock_run_command.return_value = (0, load_cmd_json_fixture)
+
+    with pytest.raises(ValueError) as e:
+        importable_pools = await get_importable_pools(1000)
+
+    assert "Found non-int characters in pool id field:" in str(e.value)
+    assert "Found non-int characters in pool id field:" in caplog.text
 
 
 @pytest.mark.asyncio

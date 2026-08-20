@@ -3,7 +3,7 @@ import logging
 import re
 
 from app.core.system.runner import async_run_command
-from app.core.zfs.models import PoolState, VDevNode
+from app.core.zfs.models import PoolState, VDevNode, ImportablePools
 from app.core.config import settings
 
 audit_logger = logging.getLogger("app.audit")
@@ -41,7 +41,7 @@ async def get_pool_statuss(uid: int) -> list[PoolState]:
     return [_build_pool_state(raw) for raw in zpool_data["pools"].values()]
 
 
-async def get_importable_pools(uid: int) -> list[tuple(str, bool)]:
+async def get_importable_pools(uid: int) -> list[ImportablePools]:
     command = [settings.ZPOOL_BINARY, "import"]
     returned_string = await _execute_zpool_command(uid, command)
     
@@ -52,9 +52,24 @@ async def get_importable_pools(uid: int) -> list[tuple(str, bool)]:
     for pool in returned_string.split("pool: ")[1:]:
         lines = pool.splitlines()
         name = lines[0].strip()
-        match = re.search(r"state:\s*(\w+)", pool)
-        is_online = (match.group(1) == "ONLINE") if match else False
-        importable_pools.append((name, is_online))
+        id_match = re.search(r"id:\s*(\w+)", pool)
+        try:
+            if id_match.group(1):
+                try:
+                    pool_id = int(id_match.group(1))
+                except ValueError:
+                    audit_logger.error(f"[CMD] Found non-int characters in pool id field: {pool}")
+                    raise ValueError(f"Found non-int characters in pool id field: {pool}")
+        except AttributeError:
+            audit_logger.error(f"[CMD] No id field in zpool import: {pool}")
+            raise AttributeError("No id field in zpool import")
+        health_match = re.search(r"state:\s*(\w+)", pool)
+        is_online = (health_match.group(1) == "ONLINE") if health_match else False
+        importable_pools.append(ImportablePools(
+            name=name,
+            id=pool_id,
+            healthy=is_online
+        ))
     
     return importable_pools
 

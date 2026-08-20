@@ -10,8 +10,7 @@ config:
 	    sdd     ONLINE
 
   pool: tank
-    id: 1234
- state: UNAVAIL
+ state: ONLINE
 action: The pool can be imported using its name or numeric identifier.
 config:
 
