@@ -3,8 +3,9 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, _build_pool_state
+from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, _build_pool_state, _execute_zpool_command
 from app.core.zfs.models import PoolState
+
 
 def test_build_pool_state_from_list():
     test_dict = {
@@ -27,7 +28,7 @@ def test_build_pool_state_from_list():
 
     return_pool = _build_pool_state(test_dict)
 
-    assert type(return_pool) == PoolState
+    assert isinstance(return_pool, PoolState)
     assert return_pool == test_pool
 
 
@@ -45,7 +46,7 @@ def test_build_pool_state_from_status():
                 "total_space": "10000",
                 "read_errors": "0",
                 "write_errors": "0",
-                "checksum_errors": "2",  # Test error bubble-up
+                "checksum_errors": "2",
                 "vdevs": {
                     "raidz1-0": {
                         "name": "raidz1-0",
@@ -74,7 +75,7 @@ def test_build_pool_state_from_status():
 
     return_pool = _build_pool_state(status_dict)
 
-    assert type(return_pool) == PoolState
+    assert isinstance(return_pool, PoolState)
     assert return_pool.name == "tank"
     assert return_pool.health == "ONLINE"
     assert return_pool.size == 10000
@@ -92,241 +93,99 @@ def test_build_pool_state_from_status():
     assert "sda" in raidz_vdev.vdevs
     assert raidz_vdev.vdevs["sda"].checksum_errors == 2
 
+
 @pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
+@patch("app.core.zfs.service.async_run_command")
+@pytest.mark.parametrize(
+    "exit_status, output, expected_exception, error_msg",
+    [
+        (127, "Error...", FileNotFoundError, "Command zpool not found, ensure `zfs` is installed"),
+        (2, "Error...", AssertionError, "Zpool appears to be different version. Arguments not parsing"),
+        (1, "Generic Error", Exception, "Generic Error"),
+    ]
+)
+async def test_execute_zpool_command_errors(mock_run, exit_status, output, expected_exception, error_msg, caplog):
+    mock_run.return_value = (exit_status, output)
+    
+    with pytest.raises(expected_exception) as e:
+        await _execute_zpool_command(uid="1000", command=["zpool", "list"])
+        
+    assert error_msg in caplog.text
+    assert error_msg in str(e.value)
+
+
+@pytest.mark.asyncio
+@patch("app.core.zfs.service.async_run_command")
+async def test_execute_zpool_command_missing_pool(mock_run, caplog):
+    mock_run.return_value = (1, "cannot open 'tank': no such pool")
+    
+    with pytest.raises(FileNotFoundError) as e:
+        await _execute_zpool_command(uid="1000", command=["zpool", "list", "tank"], pool_name="tank")
+        
+    assert "[CMD] cannot open 'tank': no such pool" in caplog.text
+    assert "cannot open 'tank': no such pool" in str(e.value)
+
+
+@pytest.mark.asyncio
+@patch("app.core.zfs.service.async_run_command")
 async def test_list_pools(mock_run_command, load_cmd_json_fixture):
     mock_run_command.return_value = (0, load_cmd_json_fixture)
 
-    zpools = await list_pools(1000)
+    zpools = await list_pools(uid="1000")
 
     mock_data = json.loads(load_cmd_json_fixture)
+    assert len(zpools) == len(mock_data["pools"])
     for mock_pool in mock_data["pools"].values():
         assert _build_pool_state(mock_pool) in zpools
 
-    assert len(mock_data["pools"]) == len(zpools)
-
 
 @pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_list_pools_empty(mock_run_command):
-    mock_run_command.return_value = (0, '')
-
-    zpools = await list_pools(1000)
-
-    assert zpools == []
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_list_pools_no_zfs(mock_run_command, caplog):
-    mock_run_command.return_value = (127, 'System execution error: No such file or directory')
-
-    with pytest.raises(FileNotFoundError) as e:
-        zpools = await list_pools(1000)
-
-    assert "[CMD] Command zpool not found, ensure `zfs` is installed" in caplog.text
-    assert "Command zpool not found, ensure `zfs` is installed" in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_list_pools_generic_error(mock_run_command, caplog):
-    mock_run_command.return_value = (1, 'Generic Error')
-
-    with pytest.raises(Exception) as e:
-        zpools = await list_pools(1000)
-
-    assert "[CMD] Generic Error" in caplog.text
-    assert "Generic Error" in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_list_pools_version_mismatch(mock_run_command, caplog):
-    mock_run_command.return_value = (2, 'unrecognized command')
-
-    with pytest.raises(AssertionError) as e:
-        zpools = await list_pools(1000)
-
-    assert "[CMD] Zpool appears to be different version. Arguments not parsing"
-    assert "Zpool appears to be different version. Arguments not parsing" in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
+@patch("app.core.zfs.service.async_run_command")
 async def test_list_pool(mock_run_command, load_cmd_json_fixture):
     mock_run_command.return_value = (0, load_cmd_json_fixture)
 
-    zpool = await list_pool(1000, "tank")
+    zpool = await list_pool(uid="1000", pool_name="tank")
 
     mock_data = json.loads(load_cmd_json_fixture)
     assert _build_pool_state(mock_data["pools"]["tank"]) == zpool
 
 
 @pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_list_pool_no_zfs(mock_run_command, caplog):
-    mock_run_command.return_value = (127, 'System execution error: No such file or directory')
-
-    with pytest.raises(FileNotFoundError) as e:
-        zpools = await list_pool(1000, "tank")
-
-    assert "[CMD] Command zpool not found, ensure `zfs` is installed" in caplog.text
-    assert "Command zpool not found, ensure `zfs` is installed" in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_list_pool_no_pool(mock_run_command, caplog):
-    mock_run_command.return_value = (1, 'cannot open \'tank\': no such pool')
-
-    with pytest.raises(FileNotFoundError) as e:
-        zpools = await list_pool(1000, "tank")
-
-    assert "[CMD] cannot open 'tank': no such pool" in caplog.text
-    assert "cannot open 'tank': no such pool" in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_list_pool_generic_error(mock_run_command, caplog):
-    mock_run_command.return_value = (1, 'Generic Error')
-
-    with pytest.raises(Exception) as e:
-        zpools = await list_pool(1000, "tank")
-
-    assert "[CMD] Generic Error" in caplog.text
-    assert "Generic Error" in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_list_pool_version_mismatch(mock_run_command, caplog):
-    mock_run_command.return_value = (2, 'unrecognized command')
-
-    with pytest.raises(AssertionError) as e:
-        zpools = await list_pool(1000, "tank")
-
-    assert "[CMD] Zpool appears to be different version. Arguments not parsing"
-    assert "Zpool appears to be different version. Arguments not parsing" in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_get_status(mock_run_command, load_cmd_json_fixture):
+@patch("app.core.zfs.service.async_run_command")
+async def test_get_pool_status(mock_run_command, load_cmd_json_fixture):
     mock_run_command.return_value = (0, load_cmd_json_fixture)
 
-    zpool = await get_pool_status(1000, "tank")
+    zpool = await get_pool_status(uid="1000", pool_name="tank")
 
     mock_data = json.loads(load_cmd_json_fixture)
-
     assert _build_pool_state(mock_data["pools"]["tank"]) == zpool
 
 
 @pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_get_status_empty(mock_run_command, caplog):
-    mock_run_command.return_value = (1, 'cannot open \'tank\': no such pool')
-
-    with pytest.raises(FileNotFoundError) as e:
-        zpools = await get_pool_status(1000, "tank")
-
-    assert "[CMD] cannot open 'tank': no such pool" in caplog.text
-    assert "cannot open 'tank': no such pool" in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_get_status_no_zfs(mock_run_command, caplog):
-    mock_run_command.return_value = (127, 'System execution error: No such file or directory')
-
-    with pytest.raises(FileNotFoundError) as e:
-        zpools = await get_pool_status(1000, "tank")
-
-    assert "[CMD] Command zpool not found, ensure `zfs` is installed" in caplog.text
-    assert "Command zpool not found, ensure `zfs` is installed" in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_get_status_generic_error(mock_run_command, caplog):
-    mock_run_command.return_value = (1, 'Generic Error')
-
-    with pytest.raises(Exception) as e:
-        zpools = await get_pool_status(1000, "tank")
-
-    assert "[CMD] Generic Error" in caplog.text
-    assert "Generic Error" in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_get_status_version_mismatch(mock_run_command, caplog):
-    mock_run_command.return_value = (2, 'unrecognized command')
-
-    with pytest.raises(AssertionError) as e:
-        zpools = await get_pool_status(1000, "tank")
-
-    assert "[CMD] Zpool appears to be different version. Arguments not parsing"
-    assert "Zpool appears to be different version. Arguments not parsing" in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_get_statuss(mock_run_command, load_cmd_json_fixture):
+@patch("app.core.zfs.service.async_run_command")
+async def test_get_pool_statuss(mock_run_command, load_cmd_json_fixture):
     mock_run_command.return_value = (0, load_cmd_json_fixture)
 
-    zpools = await get_pool_statuss(1000)
-    print(zpools)
+    zpools = await get_pool_statuss(uid="1000")
+
     mock_data = json.loads(load_cmd_json_fixture)
     for pool in mock_data["pools"].values():
-        print("------")
-        print(_build_pool_state(pool))
         assert _build_pool_state(pool) in zpools
 
 
 @pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_get_statuss_empty(mock_run_command, caplog):
-    mock_run_command.return_value = (0, '{"output_version":{"command":"zpool status"},"pools":{}}')
-
-    zpools = await get_pool_statuss(1000)
-
-    assert len(zpools) == 0
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_get_statuss_no_zfs(mock_run_command, caplog):
-    mock_run_command.return_value = (127, 'System execution error: No such file or directory')
-
-    with pytest.raises(FileNotFoundError) as e:
-        zpools = await get_pool_statuss(1000)
-
-    assert "[CMD] Command zpool not found, ensure `zfs` is installed" in caplog.text
-    assert "Command zpool not found, ensure `zfs` is installed" in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_get_statuss_generic_error(mock_run_command, caplog):
-    mock_run_command.return_value = (1, 'Generic Error')
-
-    with pytest.raises(Exception) as e:
-        zpools = await get_pool_statuss(1000)
-
-    assert "[CMD] Generic Error" in caplog.text
-    assert "Generic Error" in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_get_statuss_version_mismatch(mock_run_command, caplog):
-    mock_run_command.return_value = (2, 'unrecognized command')
-
-    with pytest.raises(AssertionError) as e:
-        zpools = await get_pool_statuss(1000)
-
-    assert "[CMD] Zpool appears to be different version. Arguments not parsing"
-    assert "Zpool appears to be different version. Arguments not parsing" in str(e.value)
-
+@patch("app.core.zfs.service.async_run_command")
+@pytest.mark.parametrize(
+    "func, mock_output",
+    [
+        (list_pools, ""),
+        (get_pool_statuss, '{"output_version":{"command":"zpool status"},"pools":{}}')
+    ]
+)
+async def test_empty_pool_collections(mock_run_command, func, mock_output):
+    """Verifies that collection getters return empty lists on missing or blank data fields."""
+    mock_run_command.return_value = (0, mock_output)
+    
+    result = await func(uid="1000")
+    
+    assert result == []

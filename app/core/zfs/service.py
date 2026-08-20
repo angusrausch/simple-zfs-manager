@@ -8,80 +8,48 @@ from app.core.config import settings
 audit_logger = logging.getLogger("app.audit")
 
 
-async def list_pool(uid: str, pool_name: str) -> [PoolState]:
+async def list_pool(uid: int, pool_name: str) -> PoolState:
     command = [settings.ZPOOL_BINARY, "list", "-pj", pool_name]
-    status, returned_string = await async_run_command(uid, command)
-
-    if status == 127:
-        audit_logger.error("[CMD] Command zpool not found, ensure `zfs` is installed")
-        raise FileNotFoundError("Command zpool not found, ensure `zfs` is installed")
-    elif status == 2:
-        audit_logger.error("[CMD] Zpool appears to be different version. Arguments not parsing")
-        raise AssertionError("Zpool appears to be different version. Arguments not parsing")
-    elif status != 0:
-        audit_logger.error(f"[CMD] {returned_string}")
-        if returned_string == f"cannot open \'{pool_name}\': no such pool":
-            raise FileNotFoundError(returned_string)
-        else:
-            raise Exception(returned_string)
-
-    zpool_data = json.loads(returned_string)
-
+    zpool_data = await _execute_zpool_command_json(uid, command, pool_name)
     return _build_pool_state(zpool_data["pools"][pool_name])
 
 
-async def list_pools(uid: str) -> [PoolState]:
+async def list_pools(uid: int) -> list[PoolState]:
     command = [settings.ZPOOL_BINARY, "list", "-pj"]
-    status, returned_string = await async_run_command(uid, command)
-
-    if status == 127:
-        audit_logger.error("[CMD] Command zpool not found, ensure `zfs` is installed")
-        raise FileNotFoundError("Command zpool not found, ensure `zfs` is installed")
-    elif status == 2:
-        audit_logger.error("[CMD] Zpool appears to be different version. Arguments not parsing")
-        raise AssertionError("Zpool appears to be different version. Arguments not parsing")
-    elif status != 0:
-        audit_logger.error(f"[CMD] {returned_string}")
-        raise Exception(returned_string)
-
-    if returned_string == '':
+    zpool_data = await _execute_zpool_command_json(uid, command)
+    
+    if not zpool_data or "pools" not in zpool_data:
         return []
 
-    zpool_data = json.loads(returned_string)
-
-    pools = []
-    for pool_raw_values in zpool_data["pools"].values():
-        pools.append(
-            _build_pool_state(pool_raw_values)
-        )
-
-    return pools
+    return [_build_pool_state(raw) for raw in zpool_data["pools"].values()]
 
 
-async def get_pool_status(uid: str, pool_name: str) -> PoolState:
+async def get_pool_status(uid: int, pool_name: str) -> PoolState:
     command = [settings.ZPOOL_BINARY, "status", "-pj", pool_name]
-    status, returned_string = await async_run_command(uid, command)
-
-    if status == 127:
-        audit_logger.error("[CMD] Command zpool not found, ensure `zfs` is installed")
-        raise FileNotFoundError("Command zpool not found, ensure `zfs` is installed")
-    elif status == 2:
-        audit_logger.error("[CMD] Zpool appears to be different version. Arguments not parsing")
-        raise AssertionError("Zpool appears to be different version. Arguments not parsing")
-    elif status != 0:
-        audit_logger.error(f"[CMD] {returned_string}")
-        if returned_string == f"cannot open \'{pool_name}\': no such pool":
-            raise FileNotFoundError(returned_string)
-        else:
-            raise Exception(returned_string)
-
-    zpool_data = json.loads(returned_string)
-
+    zpool_data = await _execute_zpool_command_json(uid, command, pool_name)
     return _build_pool_state(zpool_data["pools"][pool_name])
 
 
-async def get_pool_statuss(uid: str) -> PoolState:
+async def get_pool_statuss(uid: int) -> list[PoolState]:
     command = [settings.ZPOOL_BINARY, "status", "-pj"]
+    zpool_data = await _execute_zpool_command_json(uid, command)
+
+    if not zpool_data or "pools" not in zpool_data or len(zpool_data["pools"]) == 0:
+        return []
+
+    return [_build_pool_state(raw) for raw in zpool_data["pools"].values()]
+
+
+async def _execute_zpool_command_json(uid: int, command: list[str], pool_name: str | None = None) -> dict:
+    returned_string = await _execute_zpool_command(uid, command, pool_name)
+    if not returned_string.strip():
+        return {}
+
+    return json.loads(returned_string)
+
+
+async def _execute_zpool_command(uid: int, command: list[str], pool_name: str | None = None) -> str:
+    """Executes a zpool command, handles standard exit statuses, and returns the JSON payload."""
     status, returned_string = await async_run_command(uid, command)
 
     if status == 127:
@@ -92,20 +60,11 @@ async def get_pool_statuss(uid: str) -> PoolState:
         raise AssertionError("Zpool appears to be different version. Arguments not parsing")
     elif status != 0:
         audit_logger.error(f"[CMD] {returned_string}")
+        if pool_name and returned_string == f"cannot open '{pool_name}': no such pool":
+            raise FileNotFoundError(returned_string)
         raise Exception(returned_string)
 
-    zpool_data = json.loads(returned_string)
-
-    if len(zpool_data["pools"]) == 0:
-        return []
-
-    pools = []
-    for pool_raw_values in zpool_data["pools"].values():
-        pools.append(
-            _build_pool_state(pool_raw_values)
-        )
-    
-    return pools
+    return returned_string
 
 
 def _parse_vdev_tree(vdev_name: str, vdev_data: dict) -> VDevNode:
