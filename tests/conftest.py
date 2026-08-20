@@ -50,3 +50,17 @@ def create_lock_dir():
     lock_file_path.mkdir(parents=True, exist_ok=True)
     yield lock_file_path.parent
     shutil.rmtree(lock_file_path.parent)
+
+
+@pytest.fixture
+def load_cmd_json_fixture(request):
+    test_dir = Path(request.module.__file__).parent
+    
+    test_name = request.node.name 
+    
+    fixture_path = test_dir / "test_returns" / f"{test_name}.json"
+    
+    if not fixture_path.exists():
+        pytest.fail(f"Missing expected test fixture file at: {fixture_path}")
+        
+    return fixture_path.read_text(encoding="utf-8")
