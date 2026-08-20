@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 
 from app.core.system.runner import async_run_command
 from app.core.zfs.models import PoolState, VDevNode
@@ -38,6 +39,24 @@ async def get_pool_statuss(uid: int) -> list[PoolState]:
         return []
 
     return [_build_pool_state(raw) for raw in zpool_data["pools"].values()]
+
+
+async def get_importable_pools(uid: int) -> list[tuple(str, bool)]:
+    command = [settings.ZPOOL_BINARY, "import"]
+    returned_string = await _execute_zpool_command(uid, command)
+    
+    if returned_string == "no pools available to import":
+        return []
+
+    importable_pools = []
+    for pool in returned_string.split("pool: ")[1:]:
+        lines = pool.splitlines()
+        name = lines[0].strip()
+        match = re.search(r"state:\s*(\w+)", pool)
+        is_online = (match.group(1) == "ONLINE") if match else False
+        importable_pools.append((name, is_online))
+    
+    return importable_pools
 
 
 async def _execute_zpool_command_json(uid: int, command: list[str], pool_name: str | None = None) -> dict:

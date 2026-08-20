@@ -58,9 +58,11 @@ def load_cmd_json_fixture(request):
     
     test_name = request.node.name 
     
-    fixture_path = test_dir / "test_returns" / f"{test_name}.json"
-    
-    if not fixture_path.exists():
+    fixture_dir = fixture_path = test_dir / "test_returns"
+
+    if (fixture_dir / f"{test_name}.json").exists():
+        return (fixture_dir / f"{test_name}.json").read_text(encoding="utf-8")
+    elif (fixture_dir / f"{test_name}.txt").exists():
+        return (fixture_dir / f"{test_name}.txt").read_text(encoding="utf-8")
+    else:
         pytest.fail(f"Missing expected test fixture file at: {fixture_path}")
-        
-    return fixture_path.read_text(encoding="utf-8")

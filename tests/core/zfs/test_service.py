@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, _build_pool_state, _execute_zpool_command
+from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, _build_pool_state, _execute_zpool_command
 from app.core.zfs.models import PoolState
 
 
@@ -95,7 +95,7 @@ def test_build_pool_state_from_status():
 
 
 @pytest.mark.asyncio
-@patch("app.core.zfs.service.async_run_command")
+@patch("app.core.system.runner.run_command")
 @pytest.mark.parametrize(
     "exit_status, output, expected_exception, error_msg",
     [
@@ -115,7 +115,7 @@ async def test_execute_zpool_command_errors(mock_run, exit_status, output, expec
 
 
 @pytest.mark.asyncio
-@patch("app.core.zfs.service.async_run_command")
+@patch("app.core.system.runner.run_command")
 async def test_execute_zpool_command_missing_pool(mock_run, caplog):
     mock_run.return_value = (1, "cannot open 'tank': no such pool")
     
@@ -127,7 +127,7 @@ async def test_execute_zpool_command_missing_pool(mock_run, caplog):
 
 
 @pytest.mark.asyncio
-@patch("app.core.zfs.service.async_run_command")
+@patch("app.core.system.runner.run_command")
 async def test_list_pools(mock_run_command, load_cmd_json_fixture):
     mock_run_command.return_value = (0, load_cmd_json_fixture)
 
@@ -140,7 +140,7 @@ async def test_list_pools(mock_run_command, load_cmd_json_fixture):
 
 
 @pytest.mark.asyncio
-@patch("app.core.zfs.service.async_run_command")
+@patch("app.core.system.runner.run_command")
 async def test_list_pool(mock_run_command, load_cmd_json_fixture):
     mock_run_command.return_value = (0, load_cmd_json_fixture)
 
@@ -151,7 +151,7 @@ async def test_list_pool(mock_run_command, load_cmd_json_fixture):
 
 
 @pytest.mark.asyncio
-@patch("app.core.zfs.service.async_run_command")
+@patch("app.core.system.runner.run_command")
 async def test_get_pool_status(mock_run_command, load_cmd_json_fixture):
     mock_run_command.return_value = (0, load_cmd_json_fixture)
 
@@ -162,7 +162,7 @@ async def test_get_pool_status(mock_run_command, load_cmd_json_fixture):
 
 
 @pytest.mark.asyncio
-@patch("app.core.zfs.service.async_run_command")
+@patch("app.core.system.runner.run_command")
 async def test_get_pool_statuss(mock_run_command, load_cmd_json_fixture):
     mock_run_command.return_value = (0, load_cmd_json_fixture)
 
@@ -174,12 +174,26 @@ async def test_get_pool_statuss(mock_run_command, load_cmd_json_fixture):
 
 
 @pytest.mark.asyncio
-@patch("app.core.zfs.service.async_run_command")
+@patch("app.core.system.runner.run_command")
+async def test_get_importable_pools(mock_run_command, load_cmd_json_fixture):
+    mock_run_command.return_value = (0, load_cmd_json_fixture)
+
+    importable_pools = await get_importable_pools(1000)
+
+    assert importable_pools == [
+        ("fish", True),
+        ("tank", True)
+    ]
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
 @pytest.mark.parametrize(
     "func, mock_output",
     [
         (list_pools, ""),
-        (get_pool_statuss, '{"output_version":{"command":"zpool status"},"pools":{}}')
+        (get_pool_statuss, '{"output_version":{"command":"zpool status"},"pools":{}}'),
+        (get_importable_pools, "no pools available to import")
     ]
 )
 async def test_empty_pool_collections(mock_run_command, func, mock_output):
