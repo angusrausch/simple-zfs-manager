@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, import_pool, _build_pool_state, _execute_zpool_command
+from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, import_pool, export_pool, _build_pool_state, _execute_zpool_command
 from app.core.zfs.models import PoolState, ImportablePools
 
 
@@ -239,6 +239,28 @@ async def test_import_pool_no_pool(mock_run_command, caplog):
 
     assert f"cannot import '{pool_id}': no such pool available" in str(e.value)
     assert f"cannot import '{pool_id}': no such pool available" in caplog.text
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_export_pool(mock_run_command):
+    pool_name = "tank"
+    mock_run_command.return_value = (0, "")
+
+    await export_pool(1000, pool_name)
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_export_pool_no_pool(mock_run_command, caplog):
+    pool_name = "tank"
+    mock_run_command.return_value = (1, f"cannot open '{pool_name}': no such pool")
+
+    with pytest.raises(FileNotFoundError) as e:
+        await export_pool(1000, pool_name)
+
+    assert f"cannot open '{pool_name}': no such pool" in str(e.value)
+    assert f"cannot open '{pool_name}': no such pool" in caplog.text
 
 
 @pytest.mark.asyncio

@@ -83,6 +83,11 @@ async def import_pool(uid: int, id: int, custom_name: str = None):
     await _execute_zpool_command(uid, command, id)
 
 
+async def export_pool(uid: int, name: str):
+    command = [settings.ZPOOL_BINARY, "export", name]
+    await _execute_zpool_command(uid, command, name)
+
+
 async def _execute_zpool_command_json(uid: int, command: list[str], pool_name: str | None = None) -> dict:
     returned_string = await _execute_zpool_command(uid, command, pool_name)
     if not returned_string.strip():
