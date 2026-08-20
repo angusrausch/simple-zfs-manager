@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, _build_pool_state, _execute_zpool_command
+from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, import_pool, _build_pool_state, _execute_zpool_command
 from app.core.zfs.models import PoolState, ImportablePools
 
 
@@ -208,6 +208,37 @@ async def test_get_importable_pools_char_id(mock_run_command, load_cmd_json_fixt
 
     assert "Found non-int characters in pool id field:" in str(e.value)
     assert "Found non-int characters in pool id field:" in caplog.text
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_import_pool(mock_run_command):
+    pool_id = 4387097328
+    mock_run_command.return_value = (0, "")
+
+    await import_pool(1000, pool_id)
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_import_pool_custom_name(mock_run_command):
+    pool_id = 4387097328
+    mock_run_command.return_value = (0, "")
+
+    await import_pool(1000, pool_id, "new_pool")
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_import_pool_no_pool(mock_run_command, caplog):
+    pool_id = 4387097328
+    mock_run_command.return_value = (1, f"cannot import '{pool_id}': no such pool available")
+
+    with pytest.raises(FileNotFoundError) as e:
+        await import_pool(1000, pool_id)
+
+    assert f"cannot import '{pool_id}': no such pool available" in str(e.value)
+    assert f"cannot import '{pool_id}': no such pool available" in caplog.text
 
 
 @pytest.mark.asyncio

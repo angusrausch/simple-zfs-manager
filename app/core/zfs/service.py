@@ -74,6 +74,15 @@ async def get_importable_pools(uid: int) -> list[ImportablePools]:
     return importable_pools
 
 
+async def import_pool(uid: int, id: int, custom_name: str = None):
+    if custom_name:
+        command = [settings.ZPOOL_BINARY, "import", str(id), custom_name]
+    else:
+        command = [settings.ZPOOL_BINARY, "import", str(id)]
+    
+    await _execute_zpool_command(uid, command, id)
+
+
 async def _execute_zpool_command_json(uid: int, command: list[str], pool_name: str | None = None) -> dict:
     returned_string = await _execute_zpool_command(uid, command, pool_name)
     if not returned_string.strip():
@@ -94,7 +103,8 @@ async def _execute_zpool_command(uid: int, command: list[str], pool_name: str | 
         raise AssertionError("Zpool appears to be different version. Arguments not parsing")
     elif status != 0:
         audit_logger.error(f"[CMD] {returned_string}")
-        if pool_name and returned_string == f"cannot open '{pool_name}': no such pool":
+        if pool_name and (returned_string == f"cannot open '{pool_name}': no such pool" or 
+                returned_string == f"cannot import '{pool_name}': no such pool available"):
             raise FileNotFoundError(returned_string)
         raise Exception(returned_string)
 
