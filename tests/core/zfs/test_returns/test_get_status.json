@@ -1,0 +1,83 @@
+{
+  "output_version": {
+    "command": "zpool status",
+    "vers_major": 0,
+    "vers_minor": 1
+  },
+  "pools": {
+    "tank": {
+      "name": "tank",
+      "state": "ONLINE",
+      "pool_guid": "123456789012345678",
+      "txg": "266",
+      "spa_version": "5000",
+      "zpl_version": "5",
+      "vdevs": {
+        "tank": {
+          "name": "tank",
+          "vdev_type": "root",
+          "guid": "123456789012345678",
+          "class": "normal",
+          "state": "ONLINE",
+          "alloc_space": "340992",
+          "total_space": "476741369856",
+          "def_space": "238370684928",
+          "read_errors": "0",
+          "write_errors": "0",
+          "checksum_errors": "0",
+          "vdevs": {
+            "raidz1-0": {
+              "name": "raidz1-0",
+              "vdev_type": "raidz",
+              "guid": "876543210987654321",
+              "class": "normal",
+              "state": "ONLINE",
+              "alloc_space": "340992",
+              "total_space": "476741369856",
+              "def_space": "238370684928",
+              "rep_dev_size": "476741369856",
+              "read_errors": "0",
+              "write_errors": "0",
+              "checksum_errors": "0",
+              "vdevs": {
+                "sda": {
+                  "name": "sda",
+                  "vdev_type": "disk",
+                  "guid": "1111222233334444555",
+                  "path": "/dev/sda1",
+                  "phys_path": "platform-0000000000.pcie-pci-0000:00:00.0-ata-1.0",
+                  "devid": "ata-CT240BX500SSD1_SERIALPLACEHOLDER1-part1",
+                  "class": "normal",
+                  "state": "ONLINE",
+                  "rep_dev_size": "238375403520",
+                  "phys_space": "240047357952",
+                  "read_errors": "0",
+                  "write_errors": "0",
+                  "checksum_errors": "0",
+                  "slow_ios": "0"
+                },
+                "sdb": {
+                  "name": "sdb",
+                  "vdev_type": "disk",
+                  "guid": "6666777788889999000",
+                  "path": "/dev/sdb1",
+                  "phys_path": "platform-0000000000.pcie-pci-0000:00:00.0-ata-2.0",
+                  "devid": "ata-CT240BX500SSD1_SERIALPLACEHOLDER2-part1",
+                  "class": "normal",
+                  "state": "ONLINE",
+                  "rep_dev_size": "238375403520",
+                  "phys_space": "240047357952",
+                  "read_errors": "0",
+                  "write_errors": "0",
+                  "checksum_errors": "0",
+                  "slow_ios": "0"
+                }
+              }
+            }
+          }
+        }
+      },
+      "error_count": "0"
+    }
+  }
+}
