@@ -3,7 +3,7 @@ import logging
 import re
 
 from app.core.system.runner import async_run_command
-from app.core.zfs.models import PoolState, VDevNode, ImportablePools, RaidTypes
+from app.core.zfs.models import PoolState, VDevNode, ImportablePool, RaidType
 from app.core.config import settings
 from app.core.errors import ZFSCommandFailedError
 
@@ -42,7 +42,7 @@ async def get_pool_statuss(uid: int) -> list[PoolState]:
     return [_build_pool_state(raw) for raw in zpool_data["pools"].values()]
 
 
-async def get_importable_pools(uid: int) -> list[ImportablePools]:
+async def get_importable_pools(uid: int) -> list[ImportablePool]:
     command = [settings.ZPOOL_BINARY, "import"]
     returned_string = await _execute_zpool_command(uid, command)
     
@@ -66,7 +66,7 @@ async def get_importable_pools(uid: int) -> list[ImportablePools]:
             raise AttributeError("No id field in zpool import")
         health_match = re.search(r"state:\s*(\w+)", pool)
         is_online = (health_match.group(1) == "ONLINE") if health_match else False
-        importable_pools.append(ImportablePools(
+        importable_pools.append(ImportablePool(
             name=name,
             id=pool_id,
             healthy=is_online
@@ -89,7 +89,7 @@ async def export_pool(uid: int, name: str):
     await _execute_zpool_command(uid, command, name)
 
 
-async def create_pool(uid: int, name: str, disks: list[str], raid_type: RaidTypes, force: bool = False):
+async def create_pool(uid: int, name: str, disks: list[str], raid_type: RaidType, force: bool = False):
     command = [
         settings.ZPOOL_BINARY,
         "create",
@@ -97,18 +97,20 @@ async def create_pool(uid: int, name: str, disks: list[str], raid_type: RaidType
         "-O", "compression=lz4",
         "-O", "atime=off",
     ]
-
     if force:
         command.append("-f")
-
     command.append(name)
-
-    if raid_type != RaidTypes.STRIPE:
+    if raid_type != RaidType.STRIPE:
         command.append(raid_type.value)
-
     command += disks
     
     await _execute_zpool_command(uid, command, name)
+
+
+async def destroy_pool(uid:int, pool_name: str, force: bool = False):
+    command = [settings.ZPOOL_BINARY, "destroy", "-f", pool_name] if force else [settings.ZPOOL_BINARY, "destroy", pool_name]
+
+    await _execute_zpool_command(uid, command, pool_name)
 
 
 async def _execute_zpool_command_json(uid: int, command: list[str], pool_name: str | None = None) -> dict:

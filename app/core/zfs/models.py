@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 from enum import Enum
 
-class RaidTypes(Enum):
+class RaidType(Enum):
     STRIPE = ""
     MIRROR = "mirror"
     RAIDZ1 = "raidz1"
@@ -33,7 +33,7 @@ class PoolState(BaseModel):
     
     vdev_tree: Optional[VDevNode] = None
 
-class ImportablePools(BaseModel):
+class ImportablePool(BaseModel):
     name: str
     id: int
     healthy: bool
