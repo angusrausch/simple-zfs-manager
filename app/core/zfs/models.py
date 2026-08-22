@@ -1,5 +1,13 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
+from enum import Enum
+
+class RaidTypes(Enum):
+    STRIPE = ""
+    MIRROR = "mirror"
+    RAIDZ1 = "raidz1"
+    RAIDZ2 = "raidz2"
+    RAIDZ3 = "raidz3"
 
 class VDevNode(BaseModel):
     name: str

@@ -3,8 +3,8 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, import_pool, export_pool, _build_pool_state, _execute_zpool_command
-from app.core.zfs.models import PoolState, ImportablePools
+from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, import_pool, export_pool, create_pool, _build_pool_state, _execute_zpool_command
+from app.core.zfs.models import PoolState, ImportablePools, RaidTypes
 from app.core.errors import ZFSCommandFailedError
 
 
@@ -275,9 +275,68 @@ async def test_export_pool_no_pool(mock_run_command, caplog):
     ]
 )
 async def test_empty_pool_collections(mock_run_command, func, mock_output):
-    """Verifies that collection getters return empty lists on missing or blank data fields."""
     mock_run_command.return_value = (0, mock_output)
     
     result = await func(uid="1000")
     
     assert result == []
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_create_pool(mock_run_command):
+    mock_run_command.return_value = (0, "")
+
+    uid = 1000
+    pool_name = "fish"
+    disks = ["/dev/sda", "/dev/sdb", "/dev/sdc", "/dev/sdd"]
+
+    for raid_type in list(RaidTypes):
+        await create_pool(uid, pool_name, disks, raid_type)
+
+        await create_pool(uid, pool_name, disks, raid_type, True)
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+@pytest.mark.parametrize(
+    "raid_type, mock_output, error_return",
+    [
+        (RaidTypes.MIRROR, "invalid vdev specification: mirror requires at least 2 devices",
+            "Not enough disks selected for Mirror, must use at least 2 disks"),
+        (RaidTypes.RAIDZ1, "invalid vdev specification: raidz1 requires at least 2 devices",
+            "Not enough disks selected for RAIDZ1, must use at least 2 disks"),
+        (RaidTypes.RAIDZ2, "invalid vdev specification: raidz2 requires at least 3 devices",
+            "Not enough disks selected for RAIDZ2, must use at least 3 disks"),
+        (RaidTypes.RAIDZ3, "invalid vdev specification: raidz3 requires at least 4 devices",
+            "Not enough disks selected for RAIDZ3, must use at least 4 disks"),
+    ]
+)
+async def test_create_pool_not_enough_disks(mock_run_command, raid_type, mock_output, error_return):
+    mock_run_command.return_value = (1, mock_output)
+    
+    uid = 1000
+    pool_name = "fish"
+    disks = ["/dev/sda"]
+
+    with pytest.raises(ZFSCommandFailedError) as e:
+        await create_pool(uid, pool_name, disks, raid_type)
+
+    assert error_return in str(e.value)
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_create_pool_non_matching_disks(mock_run_command):
+    mock_run_command.return_value = (1, "invalid vdev specification\nuse '-f' to override the following errors:\nraidz contains devices of different sizes")
+
+    uid = 1000
+    pool_name = "fish"
+    disks = ["/dev/sda", "/dev/sdb", "/dev/sdc"]
+
+    with pytest.raises(ZFSCommandFailedError) as e:
+        await create_pool(uid, pool_name, disks, RaidTypes.RAIDZ1)
+
+    assert "The following Error occured, Use force option to override:\n'raidz contains devices of different sizes'" in str(e.value)
+
+    assert "use '-f' to override the following errors:" not in str(e.value)

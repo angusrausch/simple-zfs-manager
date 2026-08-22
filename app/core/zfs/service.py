@@ -3,7 +3,7 @@ import logging
 import re
 
 from app.core.system.runner import async_run_command
-from app.core.zfs.models import PoolState, VDevNode, ImportablePools
+from app.core.zfs.models import PoolState, VDevNode, ImportablePools, RaidTypes
 from app.core.config import settings
 from app.core.errors import ZFSCommandFailedError
 
@@ -89,6 +89,28 @@ async def export_pool(uid: int, name: str):
     await _execute_zpool_command(uid, command, name)
 
 
+async def create_pool(uid: int, name: str, disks: list[str], raid_type: RaidTypes, force: bool = False):
+    command = [
+        settings.ZPOOL_BINARY,
+        "create",
+        "-o", "ashift=12",
+        "-O", "compression=lz4",
+        "-O", "atime=off",
+    ]
+
+    if force:
+        command.append("-f")
+
+    command.append(name)
+
+    if raid_type != RaidTypes.STRIPE:
+        command.append(raid_type.value)
+
+    command += disks
+    
+    await _execute_zpool_command(uid, command, name)
+
+
 async def _execute_zpool_command_json(uid: int, command: list[str], pool_name: str | None = None) -> dict:
     returned_string = await _execute_zpool_command(uid, command, pool_name)
     if not returned_string.strip():
@@ -112,6 +134,19 @@ async def _execute_zpool_command(uid: int, command: list[str], pool_name: str | 
                 returned_string == f"cannot import '{pool_name}': no such pool available"):
             audit_logger.error(f"[CMD] {returned_string}")
             raise FileNotFoundError(returned_string)
+        if "invalid vdev specification" in returned_string:
+            if "use '-f' to override the following errors:" in returned_string:
+                error_details = returned_string.split("use '-f' to override the following errors:")[1].strip()
+                raise ZFSCommandFailedError(f"The following Error occured, Use force option to override:\n\'{error_details}\'")
+            error_mapping = {
+                "mirror requires at least 2 devices": "Not enough disks selected for Mirror, must use at least 2 disks",
+                "raidz1 requires at least 2 devices": "Not enough disks selected for RAIDZ1, must use at least 2 disks",
+                "raidz2 requires at least 3 devices": "Not enough disks selected for RAIDZ2, must use at least 3 disks",
+                "raidz3 requires at least 4 devices": "Not enough disks selected for RAIDZ3, must use at least 4 disks",
+            }
+            for substring, custom_message in error_mapping.items():
+                if substring in returned_string:
+                    raise ZFSCommandFailedError(custom_message)
         raise ZFSCommandFailedError.log_and_raise(returned_string)
 
     return returned_string
