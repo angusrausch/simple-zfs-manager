@@ -2,7 +2,7 @@ import json
 import logging
 import re
 
-from app.core.system.runner import async_run_command
+from app.core.zfs.utils import execute_zfs_command, execute_zfs_command_json
 from app.core.zfs.models import PoolState, VDevNode, ImportablePool, RaidType
 from app.core.config import settings
 from app.core.errors import ZFSCommandFailedError
@@ -12,13 +12,13 @@ audit_logger = logging.getLogger("app.audit")
 
 async def list_pool(uid: int, pool_name: str) -> PoolState:
     command = [settings.ZPOOL_BINARY, "list", "-pj", pool_name]
-    zpool_data = await _execute_zpool_command_json(uid, command, pool_name)
+    zpool_data = await execute_zfs_command_json(uid, command, pool_name)
     return _build_pool_state(zpool_data["pools"][pool_name])
 
 
 async def list_pools(uid: int) -> list[PoolState]:
     command = [settings.ZPOOL_BINARY, "list", "-pj"]
-    zpool_data = await _execute_zpool_command_json(uid, command)
+    zpool_data = await execute_zfs_command_json(uid, command)
     
     if not zpool_data or "pools" not in zpool_data:
         return []
@@ -28,13 +28,13 @@ async def list_pools(uid: int) -> list[PoolState]:
 
 async def get_pool_status(uid: int, pool_name: str) -> PoolState:
     command = [settings.ZPOOL_BINARY, "status", "-pj", pool_name]
-    zpool_data = await _execute_zpool_command_json(uid, command, pool_name)
+    zpool_data = await execute_zfs_command_json(uid, command, pool_name)
     return _build_pool_state(zpool_data["pools"][pool_name])
 
 
 async def get_pool_statuss(uid: int) -> list[PoolState]:
     command = [settings.ZPOOL_BINARY, "status", "-pj"]
-    zpool_data = await _execute_zpool_command_json(uid, command)
+    zpool_data = await execute_zfs_command_json(uid, command)
 
     if not zpool_data or "pools" not in zpool_data or len(zpool_data["pools"]) == 0:
         return []
@@ -44,7 +44,7 @@ async def get_pool_statuss(uid: int) -> list[PoolState]:
 
 async def get_importable_pools(uid: int) -> list[ImportablePool]:
     command = [settings.ZPOOL_BINARY, "import"]
-    returned_string = await _execute_zpool_command(uid, command)
+    returned_string = await execute_zfs_command(uid, command)
     
     if returned_string == "no pools available to import":
         return []
@@ -81,12 +81,12 @@ async def import_pool(uid: int, id: int, custom_name: str = None):
     else:
         command = [settings.ZPOOL_BINARY, "import", str(id)]
     
-    await _execute_zpool_command(uid, command, id)
+    await execute_zfs_command(uid, command, id)
 
 
 async def export_pool(uid: int, name: str):
     command = [settings.ZPOOL_BINARY, "export", name]
-    await _execute_zpool_command(uid, command, name)
+    await execute_zfs_command(uid, command, name)
 
 
 async def create_pool(uid: int, name: str, disks: list[str], raid_type: RaidType, force: bool = False):
@@ -104,59 +104,18 @@ async def create_pool(uid: int, name: str, disks: list[str], raid_type: RaidType
         command.append(raid_type.value)
     command += disks
     
-    await _execute_zpool_command(uid, command, name)
+    await execute_zfs_command(uid, command, name)
 
 
 async def destroy_pool(uid:int, pool_name: str, force: bool = False):
     command = [settings.ZPOOL_BINARY, "destroy", "-f", pool_name] if force else [settings.ZPOOL_BINARY, "destroy", pool_name]
 
-    await _execute_zpool_command(uid, command, pool_name)
+    await execute_zfs_command(uid, command, pool_name)
 
 
 async def scrub_pool(uid: int, pool_name: str):
     command = [settings.ZPOOL_BINARY, "scrub", pool_name]
-    await _execute_zpool_command(uid, command, pool_name)
-
-
-async def _execute_zpool_command_json(uid: int, command: list[str], pool_name: str | None = None) -> dict:
-    returned_string = await _execute_zpool_command(uid, command, pool_name)
-    if not returned_string.strip():
-        return {}
-
-    return json.loads(returned_string)
-
-
-async def _execute_zpool_command(uid: int, command: list[str], pool_name: str | None = None) -> str:
-    """Executes a zpool command, handles standard exit statuses, and returns the JSON payload."""
-    status, returned_string = await async_run_command(uid, command)
-
-    if status == 127:
-        audit_logger.error("[CMD] Command zpool not found, ensure `zfs` is installed")
-        raise FileNotFoundError("Command zpool not found, ensure `zfs` is installed")
-    elif status == 2:
-        audit_logger.error("[CMD] Zpool appears to be different version. Arguments not parsing")
-        raise AssertionError("Zpool appears to be different version. Arguments not parsing")
-    elif status != 0:
-        if pool_name and (returned_string == f"cannot open '{pool_name}': no such pool" or 
-                returned_string == f"cannot import '{pool_name}': no such pool available"):
-            audit_logger.error(f"[CMD] {returned_string}")
-            raise FileNotFoundError(returned_string)
-        if "invalid vdev specification" in returned_string:
-            if "use '-f' to override the following errors:" in returned_string:
-                error_details = returned_string.split("use '-f' to override the following errors:")[1].strip()
-                raise ZFSCommandFailedError(f"The following Error occured, Use force option to override:\n\'{error_details}\'")
-            error_mapping = {
-                "mirror requires at least 2 devices": "Not enough disks selected for Mirror, must use at least 2 disks",
-                "raidz1 requires at least 2 devices": "Not enough disks selected for RAIDZ1, must use at least 2 disks",
-                "raidz2 requires at least 3 devices": "Not enough disks selected for RAIDZ2, must use at least 3 disks",
-                "raidz3 requires at least 4 devices": "Not enough disks selected for RAIDZ3, must use at least 4 disks",
-            }
-            for substring, custom_message in error_mapping.items():
-                if substring in returned_string:
-                    raise ZFSCommandFailedError(custom_message)
-        raise ZFSCommandFailedError.log_and_raise(returned_string)
-
-    return returned_string
+    await execute_zfs_command(uid, command, pool_name)
 
 
 def _parse_vdev_tree(vdev_name: str, vdev_data: dict) -> VDevNode:

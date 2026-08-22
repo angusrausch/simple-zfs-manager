@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from app.core.zfs.zpool import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, import_pool, export_pool, create_pool, destroy_pool, scrub_pool, _build_pool_state, _execute_zpool_command
+from app.core.zfs.zpool import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, import_pool, export_pool, create_pool, destroy_pool, scrub_pool, _build_pool_state
 from app.core.zfs.models import PoolState, ImportablePool, RaidType
 from app.core.errors import ZFSCommandFailedError
 
@@ -93,38 +93,6 @@ def test_build_pool_state_from_status():
     assert raidz_vdev.vdev_type == "raidz"
     assert "sda" in raidz_vdev.vdevs
     assert raidz_vdev.vdevs["sda"].checksum_errors == 2
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-@pytest.mark.parametrize(
-    "exit_status, output, expected_exception, error_msg",
-    [
-        (127, "Error...", FileNotFoundError, "Command zpool not found, ensure `zfs` is installed"),
-        (2, "Error...", AssertionError, "Zpool appears to be different version. Arguments not parsing"),
-        (1, "Generic Error", ZFSCommandFailedError, "Generic Error"),
-    ]
-)
-async def test_execute_zpool_command_errors(mock_run, exit_status, output, expected_exception, error_msg, caplog):
-    mock_run.return_value = (exit_status, output)
-    
-    with pytest.raises(expected_exception) as e:
-        await _execute_zpool_command(uid="1000", command=["zpool", "list"])
-        
-    assert error_msg in caplog.text
-    assert error_msg in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_execute_zpool_command_missing_pool(mock_run, caplog):
-    mock_run.return_value = (1, "cannot open 'tank': no such pool")
-    
-    with pytest.raises(FileNotFoundError) as e:
-        await _execute_zpool_command(uid="1000", command=["zpool", "list", "tank"], pool_name="tank")
-        
-    assert "[CMD] cannot open 'tank': no such pool" in caplog.text
-    assert "cannot open 'tank': no such pool" in str(e.value)
 
 
 @pytest.mark.asyncio
