@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, import_pool, export_pool, create_pool, destroy_pool, _build_pool_state, _execute_zpool_command
+from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, import_pool, export_pool, create_pool, destroy_pool, scrub_pool, _build_pool_state, _execute_zpool_command
 from app.core.zfs.models import PoolState, ImportablePool, RaidType
 from app.core.errors import ZFSCommandFailedError
 
@@ -359,6 +359,28 @@ async def test_destroy_pool_no_pool(mock_run_command, caplog):
 
     with pytest.raises(FileNotFoundError) as e:
         await destroy_pool(1000, pool_name)
+
+    assert f"cannot open '{pool_name}': no such pool" in str(e.value)
+    assert f"cannot open '{pool_name}': no such pool" in caplog.text
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_scrub_pool(mock_run_command):
+    pool_name = "tank"
+    mock_run_command.return_value = (0, "")
+
+    await scrub_pool(1000, pool_name)
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_scrub_pool_no_pool(mock_run_command, caplog):
+    pool_name = "tank"
+    mock_run_command.return_value = (1, f"cannot open '{pool_name}': no such pool")
+
+    with pytest.raises(FileNotFoundError) as e:
+        await scrub_pool(1000, pool_name)
 
     assert f"cannot open '{pool_name}': no such pool" in str(e.value)
     assert f"cannot open '{pool_name}': no such pool" in caplog.text

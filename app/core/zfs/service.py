@@ -113,6 +113,11 @@ async def destroy_pool(uid:int, pool_name: str, force: bool = False):
     await _execute_zpool_command(uid, command, pool_name)
 
 
+async def scrub_pool(uid: int, pool_name: str):
+    command = [settings.ZPOOL_BINARY, "scrub", pool_name]
+    await _execute_zpool_command(uid, command, pool_name)
+
+
 async def _execute_zpool_command_json(uid: int, command: list[str], pool_name: str | None = None) -> dict:
     returned_string = await _execute_zpool_command(uid, command, pool_name)
     if not returned_string.strip():
