@@ -5,6 +5,7 @@ import re
 from app.core.system.runner import async_run_command
 from app.core.zfs.models import PoolState, VDevNode, ImportablePools
 from app.core.config import settings
+from app.core.errors import ZFSCommandFailedError
 
 audit_logger = logging.getLogger("app.audit")
 
@@ -107,11 +108,11 @@ async def _execute_zpool_command(uid: int, command: list[str], pool_name: str | 
         audit_logger.error("[CMD] Zpool appears to be different version. Arguments not parsing")
         raise AssertionError("Zpool appears to be different version. Arguments not parsing")
     elif status != 0:
-        audit_logger.error(f"[CMD] {returned_string}")
         if pool_name and (returned_string == f"cannot open '{pool_name}': no such pool" or 
                 returned_string == f"cannot import '{pool_name}': no such pool available"):
+            audit_logger.error(f"[CMD] {returned_string}")
             raise FileNotFoundError(returned_string)
-        raise Exception(returned_string)
+        raise ZFSCommandFailedError.log_and_raise(returned_string)
 
     return returned_string
 
@@ -134,6 +135,7 @@ def _parse_vdev_tree(vdev_name: str, vdev_data: dict) -> VDevNode:
         checksum_errors=int(vdev_data.get("checksum_errors", 0)),
         vdevs=child_vdevs
     )
+
 
 def _build_pool_state(data: dict) -> PoolState:
     if "properties" in data: # List

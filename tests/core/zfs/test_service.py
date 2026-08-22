@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, import_pool, export_pool, _build_pool_state, _execute_zpool_command
 from app.core.zfs.models import PoolState, ImportablePools
+from app.core.errors import ZFSCommandFailedError
 
 
 def test_build_pool_state_from_list():
@@ -101,7 +102,7 @@ def test_build_pool_state_from_status():
     [
         (127, "Error...", FileNotFoundError, "Command zpool not found, ensure `zfs` is installed"),
         (2, "Error...", AssertionError, "Zpool appears to be different version. Arguments not parsing"),
-        (1, "Generic Error", Exception, "Generic Error"),
+        (1, "Generic Error", ZFSCommandFailedError, "Generic Error"),
     ]
 )
 async def test_execute_zpool_command_errors(mock_run, exit_status, output, expected_exception, error_msg, caplog):

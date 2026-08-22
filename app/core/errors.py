@@ -27,3 +27,13 @@ class LockFileMismatchError(FileIntegrityError): pass
 class LockPathBlockedError(FileIntegrityError): pass
 class PathBlockedError(FileIntegrityError): pass
 class CannotWriteError(FileIntegrityError): pass
+
+
+class ZFSCommandFailedError(Exception):
+    def __init__(self, message: str):
+        super().__init__(message)
+
+    @classmethod
+    def log_and_raise(cls, detail: str):
+        audit_logger.error(f"[FILE] {detail}")
+        return cls(detail)
