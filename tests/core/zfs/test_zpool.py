@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from app.core.zfs.service import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, import_pool, export_pool, create_pool, destroy_pool, scrub_pool, _build_pool_state, _execute_zpool_command
+from app.core.zfs.zpool import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, import_pool, export_pool, create_pool, destroy_pool, scrub_pool, _build_pool_state, _execute_zpool_command
 from app.core.zfs.models import PoolState, ImportablePool, RaidType
 from app.core.errors import ZFSCommandFailedError
 
