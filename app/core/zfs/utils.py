@@ -10,7 +10,7 @@ audit_logger = logging.getLogger("app.audit")
 
 async def execute_zfs_command_json(uid: int, command: list[str], pool_name: str | None = None) -> dict:
     returned_string = await execute_zfs_command(uid, command, pool_name)
-    if not returned_string.strip():
+    if not returned_string.strip() or "no datasets available" in returned_string:
         return {}
 
     return json.loads(returned_string)

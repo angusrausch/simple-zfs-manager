@@ -3,7 +3,8 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from app.core.zfs.zfs import create_dataset, destroy_dataset
+from app.core.zfs.zfs import create_dataset, destroy_dataset, list_dataset, list_datasets, _build_dataset_state
+from app.core.zfs.models import PoolState
 from app.core.errors import ZFSCommandFailedError
 
 
@@ -56,3 +57,39 @@ async def test_destroy_dataset_no_parent(mock_run_command, caplog):
 
     assert f"cannot open '{full_name}': dataset does not exist" in str(e.value)
     assert f"cannot open '{full_name}': dataset does not exist" in caplog.text
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_list_datasets(mock_run_command, load_cmd_json_fixture):
+    mock_run_command.return_value = (0, load_cmd_json_fixture)
+    
+    datasets = await list_datasets(1000)
+
+    mock_data = json.loads(load_cmd_json_fixture)
+    assert len(datasets) == len(mock_data["datasets"])
+    
+    for mock_dataset in mock_data["datasets"].values():
+        assert _build_dataset_state(mock_dataset) in datasets
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_list_datasets_no_datasets(mock_run_command, load_cmd_json_fixture):
+    mock_run_command.return_value = (0, load_cmd_json_fixture)
+    
+    datasets = await list_datasets(1000)
+
+    assert datasets == []
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_list_dataset(mock_run_command, load_cmd_json_fixture):
+    mock_run_command.return_value = (0, load_cmd_json_fixture)
+    dataset_name = "tank/gun"
+
+    dataset = await list_dataset(1000, dataset_name)
+
+    mock_data = json.loads(load_cmd_json_fixture)
+    assert _build_dataset_state(mock_data["datasets"][dataset_name]) == dataset

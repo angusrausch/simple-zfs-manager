@@ -35,3 +35,15 @@ async def test_execute_zfs_command_missing_pool(mock_run, caplog):
         
     assert "[CMD] cannot open 'tank': no such pool" in caplog.text
     assert "cannot open 'tank': no such pool" in str(e.value)
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_execute_zfs_command_missing_dataset(mock_run, caplog):
+    mock_run.return_value = (1, "cannot open 'tank/turret': dataset does not exist")
+    
+    with pytest.raises(FileNotFoundError) as e:
+        await execute_zfs_command(uid="1000", command=["zpool", "list", "tank"], pool_name="tank/turret")
+        
+    assert "[CMD] cannot open 'tank/turret': dataset does not exist" in caplog.text
+    assert "cannot open 'tank/turret': dataset does not exist" in str(e.value)

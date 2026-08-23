@@ -35,5 +35,5 @@ class ZFSCommandFailedError(Exception):
 
     @classmethod
     def log_and_raise(cls, detail: str):
-        audit_logger.error(f"[FILE] {detail}")
+        audit_logger.error(f"[CMD] {detail}")
         return cls(detail)

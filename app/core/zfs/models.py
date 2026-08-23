@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 from enum import Enum
+from pathlib import Path
 
 class RaidType(Enum):
     STRIPE = ""
@@ -37,3 +38,14 @@ class ImportablePool(BaseModel):
     name: str
     id: int
     healthy: bool
+
+
+class DatasetState(BaseModel):
+    name: str
+    type: str
+    pool: str
+
+    used: int
+    available: int
+    referenced: int
+    mountpoint: Path
