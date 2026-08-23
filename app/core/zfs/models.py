@@ -10,6 +10,12 @@ class RaidType(Enum):
     RAIDZ2 = "raidz2"
     RAIDZ3 = "raidz3"
 
+class DatasetType(Enum):
+    FILESYSTEM = "FILESYSTEM"
+    SNAPSHOT = "SNAPSHOT"
+    VOLUME = "VOLUME"
+    BOOKMAKR = "BOOKMARK"
+
 class VDevNode(BaseModel):
     name: str
     vdev_type: str
@@ -42,10 +48,10 @@ class ImportablePool(BaseModel):
 
 class DatasetState(BaseModel):
     name: str
-    type: str
+    type: DatasetType
     pool: str
 
-    used: int
-    available: int
-    referenced: int
+    used: Optional[int] = None
+    available: Optional[int] = None
+    referenced: Optional[int] = None
     mountpoint: Path

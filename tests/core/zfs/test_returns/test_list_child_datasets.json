@@ -1,0 +1,81 @@
+{
+  "output_version": {
+    "command": "zfs list",
+    "vers_major": 0,
+    "vers_minor": 1
+  },
+  "datasets": {
+    "tank/turret": {
+      "name": "tank/turret",
+      "type": "FILESYSTEM",
+      "pool": "tank",
+      "createtxg": "21",
+      "properties": {
+        "used": {
+          "value": "67408",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "available": {
+          "value": "691161187200",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mountpoint": {
+          "value": "/tank/turret",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        }
+      }
+    },
+    "tank/turret/firing_pin": {
+      "name": "tank/turret/firing_pin",
+      "type": "FILESYSTEM",
+      "pool": "tank",
+      "createtxg": "23",
+      "properties": {
+        "used": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "available": {
+          "value": "691161187200",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mountpoint": {
+          "value": "/tank/turret/firing_pin",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        }
+      }
+    }
+  }
+}

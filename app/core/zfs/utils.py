@@ -1,6 +1,7 @@
 
 import json
 import logging
+import re
 
 from app.core.errors import ZFSCommandFailedError
 from app.core.system.runner import async_run_command
@@ -48,6 +49,10 @@ async def execute_zfs_command(uid: int, command: list[str], pool_name: str | Non
             for substring, custom_message in error_mapping.items():
                 if substring in returned_string:
                     raise ZFSCommandFailedError(custom_message)
+        if (pool_name and re.search(rf"cannot rollback to '{re.escape(pool_name)}@.*?': more recent snapshots or bookmarks exist", returned_string) and 
+                "use '-r' to force deletion of the following snapshots and bookmarks:" in returned_string):
+            error_details = returned_string.split("use '-r' to force deletion of the following snapshots and bookmarks:")[1].strip()
+            raise ZFSCommandFailedError(f"Cannot restore to snapshot where snapshots exist between target and current, use the destructive option to delete these snapshots.\nThe following snapshots are required to be removed:\n{error_details}")
         raise ZFSCommandFailedError.log_and_raise(returned_string)
 
     return returned_string

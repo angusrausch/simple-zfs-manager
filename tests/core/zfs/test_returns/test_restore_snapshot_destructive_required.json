@@ -1,0 +1,4 @@
+cannot rollback to 'tank/turret@second': more recent snapshots or bookmarks exist
+use '-r' to force deletion of the following snapshots and bookmarks:
+tank/turret@third
+tank/turret@fifth
