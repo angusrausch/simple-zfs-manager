@@ -26,8 +26,8 @@ async def execute_zfs_command(uid: int, command: list[str], pool_name: str | Non
         audit_logger.error("[CMD] Zpool appears to be different version. Arguments not parsing")
         raise AssertionError("Zpool appears to be different version. Arguments not parsing")
     elif status != 0:
-        if pool_name and (returned_string == f"cannot open '{pool_name}': no such pool" or 
-                returned_string == f"cannot import '{pool_name}': no such pool available"):
+        if pool_name and (f"'{pool_name}': no such pool" in returned_string or 
+                f"'{pool_name}': dataset does not exist" in returned_string):
             audit_logger.error(f"[CMD] {returned_string}")
             raise FileNotFoundError(returned_string)
         if "invalid vdev specification" in returned_string:
