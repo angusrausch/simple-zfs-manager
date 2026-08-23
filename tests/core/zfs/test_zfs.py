@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from app.core.zfs.zfs import create_dataset, destroy_dataset, list_dataset, list_datasets, _build_dataset_state
+from app.core.zfs.zfs import create_dataset, destroy_dataset, list_dataset, list_datasets, rename_dataset, _build_dataset_state
 from app.core.zfs.models import PoolState
 from app.core.errors import ZFSCommandFailedError
 
@@ -15,8 +15,8 @@ async def test_create_dataset(mock_run_command):
     dataset_name = "turret"
     mock_run_command.return_value = (0, "")
 
-    await create_dataset(1000, parent_name, dataset_name)
-
+    response = await create_dataset(1000, parent_name, dataset_name)
+    assert response == None
 
 @pytest.mark.asyncio
 @patch("app.core.system.runner.run_command")
@@ -35,13 +35,24 @@ async def test_create_dataset_no_parent(mock_run_command, caplog):
 
 @pytest.mark.asyncio
 @patch("app.core.system.runner.run_command")
+async def test_create_dataset_create_parents(mock_run_command):
+    parent_name = "tank/turret"
+    dataset_name = "shell"
+    mock_run_command.return_value = (0, "")
+
+    response = await create_dataset(1000, parent_name, dataset_name, create_parents=True)
+    assert response == None
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
 async def test_destroy_dataset(mock_run_command):
     parent_name = "tank"
     dataset_name = "turret"
     full_name = parent_name + "/" + dataset_name
     mock_run_command.return_value = (0, "")
 
-    await destroy_dataset(1000, full_name)
+    response = await destroy_dataset(1000, full_name)
+    assert response == None
 
 
 @pytest.mark.asyncio
@@ -93,3 +104,27 @@ async def test_list_dataset(mock_run_command, load_cmd_json_fixture):
 
     mock_data = json.loads(load_cmd_json_fixture)
     assert _build_dataset_state(mock_data["datasets"][dataset_name]) == dataset
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_rename_dataset(mock_run_command):
+    mock_run_command.return_value = (0, "")
+
+    old_dataset_name = "tank/storage/shell"
+    new_dataset_name = "tank/shell"
+
+    response = await rename_dataset(1000, old_dataset_name, new_dataset_name)
+    assert response == None
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_rename_dataset_create_parent(mock_run_command):
+    mock_run_command.return_value = (0, "")
+
+    old_dataset_name = "tank/storage/shell"
+    new_dataset_name = "tank/turret/shell"
+
+    response = await rename_dataset(1000, old_dataset_name, new_dataset_name, create_parents=True)
+    assert response == None

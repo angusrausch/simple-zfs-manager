@@ -43,7 +43,19 @@ async def test_execute_zfs_command_missing_dataset(mock_run, caplog):
     mock_run.return_value = (1, "cannot open 'tank/turret': dataset does not exist")
     
     with pytest.raises(FileNotFoundError) as e:
-        await execute_zfs_command(uid="1000", command=["zpool", "list", "tank"], pool_name="tank/turret")
+        await execute_zfs_command(uid="1000", command=["zfs", "list", "tank"], pool_name="tank/turret")
         
     assert "[CMD] cannot open 'tank/turret': dataset does not exist" in caplog.text
     assert "cannot open 'tank/turret': dataset does not exist" in str(e.value)
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_execute_zfs_command_missing_parents(mock_run, caplog):
+    mock_run.return_value = (1, "cannot create 'tank/turret/shell': parent does not exist")
+    
+    with pytest.raises(FileNotFoundError) as e:
+        await execute_zfs_command(uid="1000", command=["zfs", "create", "tank/turret/shell"], pool_name="tank/turret/shell")
+        
+    assert "[CMD] The following Error occured, Use create parents option to override:\n'cannot create 'tank/turret/shell': parent does not exist'" in caplog.text
+    assert "The following Error occured, Use create parents option to override:\n'cannot create 'tank/turret/shell': parent does not exist'" in str(e.value)

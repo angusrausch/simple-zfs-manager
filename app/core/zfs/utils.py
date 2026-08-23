@@ -16,7 +16,7 @@ async def execute_zfs_command_json(uid: int, command: list[str], pool_name: str 
     return json.loads(returned_string)
 
 
-async def execute_zfs_command(uid: int, command: list[str], pool_name: str | None = None) -> str:
+async def execute_zfs_command(uid: int, command: list[str], pool_name: str | None = None, new_name: str | None = None) -> str:
     status, returned_string = await async_run_command(uid, command)
 
     if status == 127:
@@ -27,9 +27,14 @@ async def execute_zfs_command(uid: int, command: list[str], pool_name: str | Non
         raise AssertionError("Zpool appears to be different version. Arguments not parsing")
     elif status != 0:
         if pool_name and (f"'{pool_name}': no such pool" in returned_string or 
-                f"'{pool_name}': dataset does not exist" in returned_string):
+                f"'{pool_name}': dataset does not exist" in returned_string or
+                f"'{new_name}': missing dataset name" in returned_string):
             audit_logger.error(f"[CMD] {returned_string}")
             raise FileNotFoundError(returned_string)
+        if "parent does not exist" in returned_string:
+            error_message = f"[CMD] The following Error occured, Use create parents option to override:\n\'{returned_string}\'"
+            audit_logger.error(error_message)
+            raise FileNotFoundError(error_message)
         if "invalid vdev specification" in returned_string:
             if "use '-f' to override the following errors:" in returned_string:
                 error_details = returned_string.split("use '-f' to override the following errors:")[1].strip()
