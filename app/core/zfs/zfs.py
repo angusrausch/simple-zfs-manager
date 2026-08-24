@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 import tempfile
 
-from app.core.zfs.utils import execute_zfs_command, execute_zfs_command_json
+from app.core.zfs.utils import execute_zfs_command, execute_zfs_command_json, execute_zfs_replication
 from app.core.zfs.models import DatasetState, DatasetType
 from app.core.config import settings
 from app.core.errors import ZFSCommandFailedError
@@ -150,6 +150,25 @@ async def get_datasets(uid: int) -> DatasetState:
     dataset_data = await execute_zfs_command_json(uid, command)
 
     return [_build_dataset_state(raw, detailed=True) for raw in dataset_data["datasets"].values()]
+
+
+async def replicate_snapshot(uid: int, snapshot: str, target: str, remote_host: str = None, incremental_from: str = None, recursive: bool = False, remote_sudo: bool = False):
+    send_flag = "-R" if recursive else "-p"
+    send_command = [settings.ZFS_BINARY, "send", send_flag]
+    
+    if incremental_from:
+        send_command += ["-i", incremental_from]
+    send_command.append(snapshot)
+
+    if remote_host:
+        recv_command = ["ssh", remote_host]
+        if remote_sudo:
+            recv_command.append("sudo")
+    else :
+        recv_command = []
+    recv_command += [settings.ZFS_BINARY, "receive", "-F", target]
+
+    await execute_zfs_replication(uid, send_command, recv_command, snapshot, target)
 
 
 def _value_if_key_exists(dict: dict, key: str, sub_key: str = None, bool_comparision_value: bool = None, parse: type = None):            
