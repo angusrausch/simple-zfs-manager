@@ -54,4 +54,13 @@ class DatasetState(BaseModel):
     used: Optional[int] = None
     available: Optional[int] = None
     referenced: Optional[int] = None
-    mountpoint: Path
+    mountpoint: Path = None
+
+    mounted: bool = None
+    quota: int = None
+    refquota: int = None
+    reservation: int = None
+    refreservation: int = None
+    encrypted: bool = None
+    compression: bool = None
+    readonly: bool = None

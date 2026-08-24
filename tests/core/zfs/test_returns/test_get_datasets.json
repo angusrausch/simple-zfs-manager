@@ -1,0 +1,2410 @@
+{
+  "output_version": {
+    "command": "zfs get",
+    "vers_major": 0,
+    "vers_minor": 1
+  },
+  "datasets": {
+    "tank": {
+      "name": "tank",
+      "type": "FILESYSTEM",
+      "pool": "tank",
+      "createtxg": "1",
+      "properties": {
+        "type": {
+          "value": "filesystem",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "creation": {
+          "value": "1787481854",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "used": {
+          "value": "517050",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "available": {
+          "value": "691161013318",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "35236",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "compressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mounted": {
+          "value": "yes",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "quota": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "reservation": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "recordsize": {
+          "value": "131072",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "mountpoint": {
+          "value": "/tank",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "sharenfs": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "checksum": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "compression": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "atime": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "devices": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "exec": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "setuid": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "readonly": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "zoned": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapdir": {
+          "value": "hidden",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "aclmode": {
+          "value": "discard",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "aclinherit": {
+          "value": "restricted",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "createtxg": {
+          "value": "1",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "canmount": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "xattr": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "copies": {
+          "value": "1",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "version": {
+          "value": "5",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "utf8only": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "normalization": {
+          "value": "none",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "casesensitivity": {
+          "value": "sensitive",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "vscan": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "nbmand": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "sharesmb": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refquota": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refreservation": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "guid": {
+          "value": "7007862434322378854",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "primarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "secondarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "usedbysnapshots": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "usedbydataset": {
+          "value": "35236",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "usedbychildren": {
+          "value": "481814",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "usedbyrefreservation": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logbias": {
+          "value": "latency",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "objsetid": {
+          "value": "54",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "dedup": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "mlslabel": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "sync": {
+          "value": "standard",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "dnodesize": {
+          "value": "legacy",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refcompressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "written": {
+          "value": "35236",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalused": {
+          "value": "169984",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalreferenced": {
+          "value": "12800",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "volmode": {
+          "value": "default",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "filesystem_limit": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapshot_limit": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "filesystem_count": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapshot_count": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapdev": {
+          "value": "hidden",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "acltype": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "context": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "fscontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "rootcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "relatime": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "redundant_metadata": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "overlay": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "encryption": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "keylocation": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "keyformat": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "pbkdf2iters": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "special_small_blocks": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapshots_changed": {
+          "value": "1787545522",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "prefetch": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "direct": {
+          "value": "standard",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "longname": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        }
+      }
+    },
+    "tank/storage": {
+      "name": "tank/storage",
+      "type": "FILESYSTEM",
+      "pool": "tank",
+      "createtxg": "20",
+      "properties": {
+        "type": {
+          "value": "filesystem",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "creation": {
+          "value": "1787481916",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "used": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "available": {
+          "value": "691161013318",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "compressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mounted": {
+          "value": "no",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "quota": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "reservation": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "recordsize": {
+          "value": "131072",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "mountpoint": {
+          "value": "/tank/storage",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "sharenfs": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "checksum": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "compression": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "atime": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "devices": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "exec": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "setuid": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "readonly": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "zoned": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapdir": {
+          "value": "hidden",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "aclmode": {
+          "value": "discard",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "aclinherit": {
+          "value": "restricted",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "createtxg": {
+          "value": "20",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "canmount": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "xattr": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "copies": {
+          "value": "1",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "version": {
+          "value": "5",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "utf8only": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "normalization": {
+          "value": "none",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "casesensitivity": {
+          "value": "sensitive",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "vscan": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "nbmand": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "sharesmb": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refquota": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refreservation": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "guid": {
+          "value": "10313961427149215440",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "primarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "secondarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "usedbysnapshots": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "usedbydataset": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "usedbychildren": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "usedbyrefreservation": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logbias": {
+          "value": "latency",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "objsetid": {
+          "value": "148",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "dedup": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "mlslabel": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "sync": {
+          "value": "standard",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "dnodesize": {
+          "value": "legacy",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refcompressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "written": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalused": {
+          "value": "12288",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalreferenced": {
+          "value": "12288",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "volmode": {
+          "value": "default",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "filesystem_limit": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapshot_limit": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "filesystem_count": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapshot_count": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapdev": {
+          "value": "hidden",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "acltype": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "context": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "fscontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "rootcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "relatime": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "redundant_metadata": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "overlay": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "encryption": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "keylocation": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "keyformat": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "pbkdf2iters": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "special_small_blocks": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapshots_changed": {
+          "value": "1787545539",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "prefetch": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "direct": {
+          "value": "standard",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "longname": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        }
+      }
+    },
+    "tank/turret": {
+      "name": "tank/turret",
+      "type": "FILESYSTEM",
+      "pool": "tank",
+      "createtxg": "21",
+      "properties": {
+        "type": {
+          "value": "filesystem",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "creation": {
+          "value": "1787481920",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "used": {
+          "value": "147072",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "available": {
+          "value": "691161013318",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "compressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mounted": {
+          "value": "no",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "quota": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "reservation": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "recordsize": {
+          "value": "131072",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "mountpoint": {
+          "value": "/tank/turret",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "sharenfs": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "checksum": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "compression": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "atime": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "devices": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "exec": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "setuid": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "readonly": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "zoned": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapdir": {
+          "value": "hidden",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "aclmode": {
+          "value": "discard",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "aclinherit": {
+          "value": "restricted",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "createtxg": {
+          "value": "21",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "canmount": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "xattr": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "copies": {
+          "value": "1",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "version": {
+          "value": "5",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "utf8only": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "normalization": {
+          "value": "none",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "casesensitivity": {
+          "value": "sensitive",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "vscan": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "nbmand": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "sharesmb": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refquota": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refreservation": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "guid": {
+          "value": "6018869608427981715",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "primarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "secondarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "usedbysnapshots": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "usedbydataset": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "usedbychildren": {
+          "value": "113368",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "usedbyrefreservation": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logbias": {
+          "value": "latency",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "objsetid": {
+          "value": "156",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "dedup": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "mlslabel": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "sync": {
+          "value": "standard",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "dnodesize": {
+          "value": "legacy",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refcompressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "written": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalused": {
+          "value": "62464",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalreferenced": {
+          "value": "12288",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "volmode": {
+          "value": "default",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "filesystem_limit": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapshot_limit": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "filesystem_count": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapshot_count": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapdev": {
+          "value": "hidden",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "acltype": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "context": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "fscontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "rootcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "relatime": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "redundant_metadata": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "overlay": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "encryption": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "keylocation": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "keyformat": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "pbkdf2iters": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "special_small_blocks": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapshots_changed": {
+          "value": "1787545725",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "prefetch": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "direct": {
+          "value": "standard",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "longname": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        }
+      }
+    },
+    "tank/turret@now": {
+      "name": "tank/turret@now",
+      "type": "SNAPSHOT",
+      "pool": "tank",
+      "createtxg": "5586",
+      "dataset": "tank/turret",
+      "snapshot_name": "now",
+      "properties": {
+        "type": {
+          "value": "snapshot",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "creation": {
+          "value": "1787545725",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "used": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "compressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "devices": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "exec": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "setuid": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "createtxg": {
+          "value": "5586",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "xattr": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "version": {
+          "value": "5",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "utf8only": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "normalization": {
+          "value": "none",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "casesensitivity": {
+          "value": "sensitive",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "nbmand": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "guid": {
+          "value": "3054399928612593190",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "primarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "secondarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defer_destroy": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "userrefs": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "objsetid": {
+          "value": "324",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mlslabel": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refcompressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "written": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalreferenced": {
+          "value": "12288",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "acltype": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "context": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "fscontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "rootcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "encryption": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "prefetch": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        }
+      }
+    },
+    "tank/turret/shell": {
+      "name": "tank/turret/shell",
+      "type": "FILESYSTEM",
+      "pool": "tank",
+      "createtxg": "5577",
+      "properties": {
+        "type": {
+          "value": "filesystem",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "creation": {
+          "value": "1787545686",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "used": {
+          "value": "113368",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "available": {
+          "value": "691161013318",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "113368",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "compressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mounted": {
+          "value": "yes",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "quota": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "reservation": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "recordsize": {
+          "value": "131072",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "mountpoint": {
+          "value": "/tank/turret/shell",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "sharenfs": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "checksum": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "compression": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "atime": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "devices": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "exec": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "setuid": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "readonly": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "zoned": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapdir": {
+          "value": "hidden",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "aclmode": {
+          "value": "discard",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "aclinherit": {
+          "value": "restricted",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "createtxg": {
+          "value": "5577",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "canmount": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "xattr": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "copies": {
+          "value": "1",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "version": {
+          "value": "5",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "utf8only": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "normalization": {
+          "value": "none",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "casesensitivity": {
+          "value": "sensitive",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "vscan": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "nbmand": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "sharesmb": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refquota": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refreservation": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "guid": {
+          "value": "856022716250340481",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "primarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "secondarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "usedbysnapshots": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "usedbydataset": {
+          "value": "113368",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "usedbychildren": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "usedbyrefreservation": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logbias": {
+          "value": "latency",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "objsetid": {
+          "value": "317",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "dedup": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "mlslabel": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "sync": {
+          "value": "standard",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "dnodesize": {
+          "value": "legacy",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refcompressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "written": {
+          "value": "113368",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalused": {
+          "value": "50176",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalreferenced": {
+          "value": "50176",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "volmode": {
+          "value": "default",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "filesystem_limit": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapshot_limit": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "filesystem_count": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapshot_count": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "snapdev": {
+          "value": "hidden",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "acltype": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "context": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "fscontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "rootcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "relatime": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "redundant_metadata": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "overlay": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "encryption": {
+          "value": "aes-256-gcm",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "keylocation": {
+          "value": "file:////tmp/tmpr5l8aahi",
+          "source": {
+            "type": "LOCAL",
+            "data": "-"
+          }
+        },
+        "keyformat": {
+          "value": "passphrase",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "pbkdf2iters": {
+          "value": "350000",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "encryptionroot": {
+          "value": "tank/turret/shell",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "keystatus": {
+          "value": "available",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "special_small_blocks": {
+          "value": "0",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "prefetch": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "direct": {
+          "value": "standard",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "longname": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        }
+      }
+    }
+  }
+}

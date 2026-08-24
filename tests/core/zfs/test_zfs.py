@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from app.core.zfs.zfs import create_dataset, destroy_dataset, list_dataset, list_datasets, rename_dataset, create_snapshot, list_child_datasets, list_snapshots, restore_snapshot, mount_dataset, unmount_dataset, load_key, unload_key, _build_dataset_state
+from app.core.zfs.zfs import create_dataset, destroy_dataset, list_dataset, list_datasets, rename_dataset, create_snapshot, list_child_datasets, list_snapshots, restore_snapshot, mount_dataset, unmount_dataset, load_key, unload_key, get_datasets, get_dataset, _build_dataset_state
 from app.core.zfs.models import PoolState
 from app.core.errors import ZFSCommandFailedError
 
@@ -418,3 +418,28 @@ async def test_unload_key_recursive(mock_run_command):
 
     assert response == None
 
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_get_datasets(mock_run_command, load_cmd_json_fixture):
+    mock_run_command.return_value = (0, load_cmd_json_fixture)
+    
+    datasets = await get_datasets(1000)
+
+    mock_data = json.loads(load_cmd_json_fixture)
+    assert len(datasets) == len(mock_data["datasets"])
+    
+    for mock_dataset in mock_data["datasets"].values():
+        assert _build_dataset_state(mock_dataset, detailed=True) in datasets
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_get_dataset(mock_run_command, load_cmd_json_fixture):
+    mock_run_command.return_value = (0, load_cmd_json_fixture)
+    dataset_name = "tank"
+
+    dataset = await get_dataset(1000, dataset_name)
+
+    mock_data = json.loads(load_cmd_json_fixture)
+    assert _build_dataset_state(mock_data["datasets"][dataset_name], detailed=True) == dataset

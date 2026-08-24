@@ -136,14 +136,58 @@ async def unload_key(uid: int, dataset_name: str, recursive: bool = False):
     await execute_zfs_command(uid, command, dataset_name)
 
 
-def _build_dataset_state(data: dict) -> DatasetState:
+async def get_dataset(uid: int, dataset_name: str) -> DatasetState:
+    command = [settings.ZFS_BINARY, "get", "all", "-pj", dataset_name]
+    
+    dataset_data = await execute_zfs_command_json(uid, command, dataset_name)
+
+    return _build_dataset_state(dataset_data["datasets"][dataset_name], detailed=True)
+
+
+async def get_datasets(uid: int) -> DatasetState:
+    command = [settings.ZFS_BINARY, "get", "all", "-pj"]
+    
+    dataset_data = await execute_zfs_command_json(uid, command)
+
+    return [_build_dataset_state(raw, detailed=True) for raw in dataset_data["datasets"].values()]
+
+
+def _value_if_key_exists(dict: dict, key: str, sub_key: str = None, bool_comparision_value: bool = None, parse: type = None):            
+    if not key in dict:
+        return
+    value = dict[key]
+    if sub_key:
+        value = value[sub_key]
+
+    if bool_comparision_value:
+        return value == bool_comparision_value
+    if parse:
+        try:
+            return parse(value)
+        except ValueError:
+            return None
+    return value
+
+def _build_dataset_state(data: dict, detailed: bool = False) -> DatasetState:
     properties = data["properties"]
-    return DatasetState(
+    state = DatasetState(
         name=data["name"],
         type=DatasetType(data["type"]),
         pool=data["pool"],
-        used=properties["used"]["value"] if properties["used"]["value"] != "-" else None,
-        available=properties["available"]["value"] if properties["available"]["value"] != "-" else None,
-        referenced=properties["referenced"]["value"] if properties["referenced"]["value"] != "-" else None,
-        mountpoint=Path(properties["mountpoint"]["value"])
     )
+    state.mountpoint = _value_if_key_exists(properties, "mountpoint", "value", parse=Path)
+    state.used = _value_if_key_exists(properties, "used", "value", parse=int)
+    state.available = _value_if_key_exists(properties, "available", "value", parse=int)
+    state.referenced = _value_if_key_exists(properties, "referenced", "value", parse=int)
+
+    if detailed:
+        state.mounted = _value_if_key_exists(properties, "mounted", "value", bool_comparision_value="yes")
+        state.quota = _value_if_key_exists(properties, "quota", "value", parse=int)
+        state.refquota = _value_if_key_exists(properties, "refquota", "value", parse=int)
+        state.reservation = _value_if_key_exists(properties, "reservation", "value", parse=int)
+        state.refreservation = _value_if_key_exists(properties, "refreservation", "value", parse=int)
+        state.encrypted = not _value_if_key_exists(properties, "encryption", "value", bool_comparision_value="off")
+        state.compression = _value_if_key_exists(properties, "compression", "value", bool_comparision_value="on")
+        state.readonly = _value_if_key_exists(properties, "readonly", "value", bool_comparision_value="on")
+
+    return state
