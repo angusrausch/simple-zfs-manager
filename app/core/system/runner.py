@@ -56,15 +56,3 @@ def run_command(uid: int, command: list[str], timeout: int = DEFAULT_TIMEOUT) ->
 
 async def async_run_command(uid: int, command: list[str], timeout: int = DEFAULT_TIMEOUT) -> tuple[int, str]:
     return await asyncio.to_thread(run_command, uid, command, timeout)
-
-
-async def create_piped_asyncio_subprocess(uid: int, command: list[str], stdin_pipe=asyncio.subprocess.PIPE) -> asyncio.subprocess.Process:
-    command_str = " ".join(shlex.quote(str(item)) for item in command)
-    audit_logger.info(f"[CMD] User {uid} requested command: {command_str}")
-
-    return await asyncio.create_subprocess_exec(
-        *command,
-        stdin=stdin_pipe,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE
-    )
