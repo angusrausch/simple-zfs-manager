@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from app.core.zfs.zfs import create_dataset, destroy_dataset, list_dataset, list_datasets, rename_dataset, create_snapshot, list_child_datasets, list_snapshots, restore_snapshot, _build_dataset_state
+from app.core.zfs.zfs import create_dataset, destroy_dataset, list_dataset, list_datasets, rename_dataset, create_snapshot, list_child_datasets, list_snapshots, restore_snapshot, mount_dataset, unmount_dataset, load_key, unload_key, _build_dataset_state
 from app.core.zfs.models import PoolState
 from app.core.errors import ZFSCommandFailedError
 
@@ -41,6 +41,17 @@ async def test_create_dataset_create_parents(mock_run_command):
     mock_run_command.return_value = (0, "")
 
     response = await create_dataset(1000, parent_name, dataset_name, create_parents=True)
+    assert response == None
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_create_dataset_encryption(mock_run_command):
+    parent_name = "tank/turret"
+    dataset_name = "shell"
+    mock_run_command.return_value = (0, "")
+
+    response = await create_dataset(1000, parent_name, dataset_name, encryption="encryption_password")
     assert response == None
 
 
@@ -280,3 +291,130 @@ async def test_list_snapshots_name(mock_run_command, load_cmd_json_fixture):
     
     for mock_dataset in mock_data["datasets"].values():
         assert _build_dataset_state(mock_dataset) in datasets
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_mount_dataset(mock_run_command):
+    mock_run_command.return_value = (0, "")
+
+    response = await mount_dataset(1000, "tank/turret")
+
+    assert response == None
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_mount_dataset_recursive(mock_run_command):
+    mock_run_command.return_value = (0, "")
+
+    response = await mount_dataset(1000, "tank/turret", recursive=True)
+
+    assert response == None
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_mount_dataset_encrypted(mock_run_command):
+    mock_run_command.return_value = (0, "")
+
+    response = await mount_dataset(1000, "tank/turret", encryption="encryption_password")
+
+    assert response == None
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_mount_dataset_encrypted_incorrect_key(mock_run_command, caplog):
+    mock_run_command.return_value = (1, "Key load error: Incorrect key provided for 'tank/turret/shell'")
+
+    with pytest.raises(ZFSCommandFailedError) as e:
+        await mount_dataset(1000, "tank/turret", encryption="wrong_encryption_password")
+
+    assert "Key load error: Incorrect key provided for 'tank/turret/shell'" in str(e.value)
+    assert "[CMD] Key load error: Incorrect key provided for 'tank/turret/shell'" in caplog.text
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_unmount_dataset(mock_run_command):
+    mock_run_command.return_value = (0, "")
+
+    response = await unmount_dataset(1000, "tank/turret")
+
+    assert response == None
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_mount_dataset_force(mock_run_command):
+    mock_run_command.return_value = (0, "")
+
+    response = await unmount_dataset(1000, "tank/turret", force=True)
+
+    assert response == None
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_unmount_dataset_encrypted(mock_run_command):
+    mock_run_command.return_value = (0, "")
+
+    response = await unmount_dataset(1000, "tank/turret", unload_key=True)
+
+    assert response == None
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_unmount_dataset_not_mounted(mock_run_command, caplog):
+    mock_run_command.return_value = (1, "app.core.errors.ZFSCommandFailedError: cannot unmount 'tank/turret/shell': not currently mounted'")
+
+    with pytest.raises(ZFSCommandFailedError) as e:
+        await unmount_dataset(1000, "tank/turret")
+
+    assert "cannot unmount 'tank/turret/shell': not currently mounted'" in str(e.value)
+    assert "cannot unmount 'tank/turret/shell': not currently mounted'" in caplog.text
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_load_key(mock_run_command):
+    mock_run_command.return_value = (0, "")
+
+    response = await load_key(1000, "tank/turret", "encryption_password")
+
+    assert response == None
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_load_key_incorrect_key(mock_run_command, caplog):
+    mock_run_command.return_value = (1, "Key load error: Incorrect key provided for 'tank/turret/shell'")
+
+    with pytest.raises(ZFSCommandFailedError) as e:
+        await load_key(1000, "tank/turret", "wrong_encryption_password")
+
+    assert "Key load error: Incorrect key provided for 'tank/turret/shell'" in str(e.value)
+    assert "[CMD] Key load error: Incorrect key provided for 'tank/turret/shell'" in caplog.text
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_unload_key(mock_run_command):
+    mock_run_command.return_value = (0, "")
+
+    response = await unload_key(1000, "tank/turret")
+
+    assert response == None
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+async def test_unload_key_recursive(mock_run_command):
+    mock_run_command.return_value = (0, "")
+
+    response = await unload_key(1000, "tank/turret", recursive=True)
+
+    assert response == None
+
