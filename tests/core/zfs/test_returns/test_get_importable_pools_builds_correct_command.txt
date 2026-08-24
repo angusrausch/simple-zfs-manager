@@ -1,0 +1,12 @@
+  pool: tank
+    id: 14546373932809041704
+ state: ONLINE
+action: The pool can be imported using its name or numeric identifier.
+config:
+
+	tank        ONLINE
+	  raidz1-0  ONLINE
+	    sda     ONLINE
+	    sdb     ONLINE
+	    sdc     ONLINE
+	    sdd     ONLINE

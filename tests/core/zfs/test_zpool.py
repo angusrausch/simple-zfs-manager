@@ -3,9 +3,10 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from app.core.zfs.zpool import list_pools, list_pool, get_pool_status, get_pool_statuss, get_importable_pools, import_pool, export_pool, create_pool, destroy_pool, scrub_pool, _build_pool_state
+from app.core.zfs.zpool import list_pool, get_pool_status, get_importable_pools, import_pool, export_pool, create_pool, destroy_pool, scrub_pool, _build_pool_state
 from app.core.zfs.models import PoolState, ImportablePool, RaidType
 from app.core.errors import ZFSCommandFailedError
+from app.core.config import settings
 
 
 def test_build_pool_state_from_list():
@@ -100,7 +101,7 @@ def test_build_pool_state_from_status():
 async def test_list_pools(mock_run_command, load_cmd_json_fixture):
     mock_run_command.return_value = (0, load_cmd_json_fixture)
 
-    zpools = await list_pools(uid="1000")
+    zpools = await list_pool(uid="1000")
 
     mock_data = json.loads(load_cmd_json_fixture)
     assert len(zpools) == len(mock_data["pools"])
@@ -120,6 +121,21 @@ async def test_list_pool(mock_run_command, load_cmd_json_fixture):
 
 
 @pytest.mark.asyncio
+@patch("app.core.zfs.zpool._build_pool_state")
+@patch("app.core.zfs.zpool.execute_zfs_command_json")
+async def test_list_pool(mock_execute, mock_build_state):
+    mock_execute.return_value = {"pools": {"tank": {}}}
+    mock_build_state.return_value = "mock_state"
+
+    await list_pool(1000)
+    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "list", "-pj"])
+
+    pool_name = "tank"
+    await list_pool(1000, pool_name)
+    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "list", "-pj", pool_name], pool_name)
+
+
+@pytest.mark.asyncio
 @patch("app.core.system.runner.run_command")
 async def test_get_pool_status(mock_run_command, load_cmd_json_fixture):
     mock_run_command.return_value = (0, load_cmd_json_fixture)
@@ -135,11 +151,35 @@ async def test_get_pool_status(mock_run_command, load_cmd_json_fixture):
 async def test_get_pool_statuss(mock_run_command, load_cmd_json_fixture):
     mock_run_command.return_value = (0, load_cmd_json_fixture)
 
-    zpools = await get_pool_statuss(uid="1000")
+    zpools = await get_pool_status(uid="1000")
 
     mock_data = json.loads(load_cmd_json_fixture)
     for pool in mock_data["pools"].values():
         assert _build_pool_state(pool) in zpools
+
+
+@pytest.mark.asyncio
+@patch("app.core.zfs.zpool._build_pool_state")
+@patch("app.core.zfs.zpool.execute_zfs_command_json")
+async def test_get_pool_status(mock_execute, mock_build_state):
+    mock_execute.return_value = {"pools": {"tank": {}}}
+    mock_build_state.return_value = "mock_state"
+
+    await get_pool_status(1000)
+    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "status", "-pj"])
+
+    pool_name = "tank"
+    await get_pool_status(1000, pool_name)
+    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "status", "-pj", pool_name], pool_name)
+
+
+@pytest.mark.asyncio
+@patch("app.core.zfs.zpool.execute_zfs_command")
+async def test_get_importable_pools(mock_execute, load_cmd_json_fixture):
+    mock_execute.return_value = load_cmd_json_fixture
+
+    await get_importable_pools(1000)
+    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "import"])
 
 
 @pytest.mark.asyncio
@@ -161,7 +201,7 @@ async def test_get_importable_pools_no_id(mock_run_command, load_cmd_json_fixtur
     mock_run_command.return_value = (0, load_cmd_json_fixture)
 
     with pytest.raises(AttributeError) as e:
-        importable_pools = await get_importable_pools(1000)
+        await get_importable_pools(1000)
 
     assert "No id field in zpool import" in str(e.value)
     assert "No id field in zpool import" in caplog.text
@@ -173,63 +213,31 @@ async def test_get_importable_pools_char_id(mock_run_command, load_cmd_json_fixt
     mock_run_command.return_value = (0, load_cmd_json_fixture)
 
     with pytest.raises(ValueError) as e:
-        importable_pools = await get_importable_pools(1000)
+        await get_importable_pools(1000)
 
     assert "Found non-int characters in pool id field:" in str(e.value)
     assert "Found non-int characters in pool id field:" in caplog.text
 
 
 @pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_import_pool(mock_run_command):
+@patch("app.core.zfs.zpool.execute_zfs_command") 
+async def test_import_pool(mock_execute):
     pool_id = 4387097328
-    mock_run_command.return_value = (0, "")
+    
+    assert await import_pool(1000, pool_id) is None
+    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "import", "4387097328"], pool_id)
 
-    await import_pool(1000, pool_id)
+    assert await import_pool(1000, pool_id, custom_name="new_tank") is None
+    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "import", "4387097328", "new_tank"], pool_id)
 
 
 @pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_import_pool_custom_name(mock_run_command):
-    pool_id = 4387097328
-    mock_run_command.return_value = (0, "")
-
-    await import_pool(1000, pool_id, "new_pool")
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_import_pool_no_pool(mock_run_command, caplog):
-    pool_id = 4387097328
-    mock_run_command.return_value = (1, f"cannot import '{pool_id}': no such pool available")
-
-    with pytest.raises(FileNotFoundError) as e:
-        await import_pool(1000, pool_id)
-
-    assert f"cannot import '{pool_id}': no such pool available" in str(e.value)
-    assert f"cannot import '{pool_id}': no such pool available" in caplog.text
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_export_pool(mock_run_command):
+@patch("app.core.zfs.zpool.execute_zfs_command") 
+async def test_export_pool(mock_execute):
     pool_name = "tank"
-    mock_run_command.return_value = (0, "")
-
-    await export_pool(1000, pool_name)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_export_pool_no_pool(mock_run_command, caplog):
-    pool_name = "tank"
-    mock_run_command.return_value = (1, f"cannot open '{pool_name}': no such pool")
-
-    with pytest.raises(FileNotFoundError) as e:
-        await export_pool(1000, pool_name)
-
-    assert f"cannot open '{pool_name}': no such pool" in str(e.value)
-    assert f"cannot open '{pool_name}': no such pool" in caplog.text
+    
+    assert await export_pool(1000, pool_name) is None
+    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "export", pool_name], pool_name)
 
 
 @pytest.mark.asyncio
@@ -237,8 +245,8 @@ async def test_export_pool_no_pool(mock_run_command, caplog):
 @pytest.mark.parametrize(
     "func, mock_output",
     [
-        (list_pools, ""),
-        (get_pool_statuss, '{"output_version":{"command":"zpool status"},"pools":{}}'),
+        (list_pool, ""),
+        (get_pool_status, '{"output_version":{"command":"zpool status"},"pools":{}}'),
         (get_importable_pools, "no pools available to import")
     ]
 )
@@ -251,104 +259,34 @@ async def test_empty_pool_collections(mock_run_command, func, mock_output):
 
 
 @pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_create_pool(mock_run_command):
-    mock_run_command.return_value = (0, "")
-
-    uid = 1000
-    pool_name = "fish"
+@patch("app.core.zfs.zpool.execute_zfs_command") 
+async def test_create_pool(mock_execute):
+    pool_name = "tank"
     disks = ["/dev/sda", "/dev/sdb", "/dev/sdc", "/dev/sdd"]
-
-    for raid_type in list(RaidType):
-        await create_pool(uid, pool_name, disks, raid_type)
-
-        await create_pool(uid, pool_name, disks, raid_type, True)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-@pytest.mark.parametrize(
-    "raid_type, mock_output, error_return",
-    [
-        (RaidType.MIRROR, "invalid vdev specification: mirror requires at least 2 devices",
-            "Not enough disks selected for Mirror, must use at least 2 disks"),
-        (RaidType.RAIDZ1, "invalid vdev specification: raidz1 requires at least 2 devices",
-            "Not enough disks selected for RAIDZ1, must use at least 2 disks"),
-        (RaidType.RAIDZ2, "invalid vdev specification: raidz2 requires at least 3 devices",
-            "Not enough disks selected for RAIDZ2, must use at least 3 disks"),
-        (RaidType.RAIDZ3, "invalid vdev specification: raidz3 requires at least 4 devices",
-            "Not enough disks selected for RAIDZ3, must use at least 4 disks"),
-    ]
-)
-async def test_create_pool_not_enough_disks(mock_run_command, raid_type, mock_output, error_return):
-    mock_run_command.return_value = (1, mock_output)
     
-    uid = 1000
-    pool_name = "fish"
-    disks = ["/dev/sda"]
-
-    with pytest.raises(ZFSCommandFailedError) as e:
-        await create_pool(uid, pool_name, disks, raid_type)
-
-    assert error_return in str(e.value)
+    for raid_type in list(RaidType):
+        assert await create_pool(1000, pool_name, disks, raid_type) is None
+        assert await create_pool(1000, pool_name, disks, raid_type, force=True) is None
+    await create_pool(1000, pool_name, disks, RaidType.MIRROR)
+    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "create", '-o', 'ashift=12', '-O', 'compression=lz4', '-O', 'atime=off', pool_name, RaidType.MIRROR.value, "/dev/sda", "/dev/sdb", "/dev/sdc", "/dev/sdd"], pool_name)
 
 
 @pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_create_pool_non_matching_disks(mock_run_command):
-    mock_run_command.return_value = (1, "invalid vdev specification\nuse '-f' to override the following errors:\nraidz contains devices of different sizes")
-
-    uid = 1000
-    pool_name = "fish"
-    disks = ["/dev/sda", "/dev/sdb", "/dev/sdc"]
-
-    with pytest.raises(ZFSCommandFailedError) as e:
-        await create_pool(uid, pool_name, disks, RaidType.RAIDZ1)
-
-    assert "The following Error occured, Use force option to override:\n'raidz contains devices of different sizes'" in str(e.value)
-
-    assert "use '-f' to override the following errors:" not in str(e.value)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_destroy_pool(mock_run_command):
+@patch("app.core.zfs.zpool.execute_zfs_command") 
+async def test_destroy_pool(mock_execute):
     pool_name = "tank"
-    mock_run_command.return_value = (0, "")
+    
+    assert await destroy_pool(1000, pool_name) is None
+    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "destroy", pool_name], pool_name)
 
-    await destroy_pool(1000, pool_name)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_destroy_pool_no_pool(mock_run_command, caplog):
-    pool_name = "tank"
-    mock_run_command.return_value = (1, f"cannot open '{pool_name}': no such pool")
-
-    with pytest.raises(FileNotFoundError) as e:
-        await destroy_pool(1000, pool_name)
-
-    assert f"cannot open '{pool_name}': no such pool" in str(e.value)
-    assert f"cannot open '{pool_name}': no such pool" in caplog.text
+    assert await destroy_pool(1000, pool_name, force=True) is None
+    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "destroy", "-f", pool_name], pool_name)
 
 
 @pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_scrub_pool(mock_run_command):
+@patch("app.core.zfs.zpool.execute_zfs_command") 
+async def test_scrub_pool(mock_execute):
     pool_name = "tank"
-    mock_run_command.return_value = (0, "")
-
-    await scrub_pool(1000, pool_name)
-
-
-@pytest.mark.asyncio
-@patch("app.core.system.runner.run_command")
-async def test_scrub_pool_no_pool(mock_run_command, caplog):
-    pool_name = "tank"
-    mock_run_command.return_value = (1, f"cannot open '{pool_name}': no such pool")
-
-    with pytest.raises(FileNotFoundError) as e:
-        await scrub_pool(1000, pool_name)
-
-    assert f"cannot open '{pool_name}': no such pool" in str(e.value)
-    assert f"cannot open '{pool_name}': no such pool" in caplog.text
+    
+    assert await scrub_pool(1000, pool_name) is None
+    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "scrub", pool_name], pool_name)

@@ -67,6 +67,8 @@ async def test_execute_zfs_command_invalid_vdev(mock_run, output, error_msg, cap
                 "cannot open 'tank': no such pool"),
         ("cannot open 'tank/turret': dataset does not exist", ["zfs", "list", "tank"], "tank/turret",
                 "cannot open 'tank/turret': dataset does not exist"),
+        ("cannot import '4387097328': no such pool available", ["zfs", "import", "4387097328"], "4387097328",
+                "cannot import '4387097328': no such pool available"),
     ]
 )
 async def test_execute_zfs_command_missing_dataset(mock_run, output, command, pool, error_msg, caplog):
@@ -94,7 +96,7 @@ async def test_execute_zfs_command_missing_parents(mock_run, caplog):
 
 @pytest.mark.asyncio
 @patch("app.core.system.runner.run_command")
-async def test_execute_zfs_command_missing_dataset(mock_run, caplog):
+async def test_execute_zfs_command_snapshots_exist(mock_run, caplog):
     mock_run.return_value = (1, "cannot rollback to 'tank/turret@now': more recent snapshots or bookmarks exist\nuse '-r' to force deletion of the following snapshots and bookmarks:\ntank/turret@future")
     
     with pytest.raises(ZFSCommandFailedError) as e:

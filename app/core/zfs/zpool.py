@@ -10,36 +10,33 @@ from app.core.errors import ZFSCommandFailedError
 audit_logger = logging.getLogger("app.audit")
 
 
-async def list_pool(uid: int, pool_name: str) -> PoolState:
-    command = [settings.ZPOOL_BINARY, "list", "-pj", pool_name]
-    zpool_data = await execute_zfs_command_json(uid, command, pool_name)
-    return _build_pool_state(zpool_data["pools"][pool_name])
-
-
-async def list_pools(uid: int) -> list[PoolState]:
+async def list_pool(uid: int, pool_name: str | None = None) -> PoolState:
     command = [settings.ZPOOL_BINARY, "list", "-pj"]
-    zpool_data = await execute_zfs_command_json(uid, command)
-    
-    if not zpool_data or "pools" not in zpool_data:
-        return []
 
-    return [_build_pool_state(raw) for raw in zpool_data["pools"].values()]
+    if pool_name:
+        command.append(pool_name)
+        zpool_data = await execute_zfs_command_json(uid, command, pool_name)
+        return _build_pool_state(zpool_data["pools"][pool_name])
+    else:
+        command = [settings.ZPOOL_BINARY, "list", "-pj"]
+        zpool_data = await execute_zfs_command_json(uid, command)       
+        if not zpool_data or "pools" not in zpool_data:
+            return []
+        return [_build_pool_state(raw) for raw in zpool_data["pools"].values()]
 
 
-async def get_pool_status(uid: int, pool_name: str) -> PoolState:
-    command = [settings.ZPOOL_BINARY, "status", "-pj", pool_name]
-    zpool_data = await execute_zfs_command_json(uid, command, pool_name)
-    return _build_pool_state(zpool_data["pools"][pool_name])
-
-
-async def get_pool_statuss(uid: int) -> list[PoolState]:
+async def get_pool_status(uid: int, pool_name: str | None = None) -> PoolState:
     command = [settings.ZPOOL_BINARY, "status", "-pj"]
-    zpool_data = await execute_zfs_command_json(uid, command)
 
-    if not zpool_data or "pools" not in zpool_data or len(zpool_data["pools"]) == 0:
-        return []
-
-    return [_build_pool_state(raw) for raw in zpool_data["pools"].values()]
+    if pool_name:
+        command.append(pool_name)
+        zpool_data = await execute_zfs_command_json(uid, command, pool_name)
+        return _build_pool_state(zpool_data["pools"][pool_name])
+    else:
+        zpool_data = await execute_zfs_command_json(uid, command)
+        if not zpool_data or "pools" not in zpool_data or len(zpool_data["pools"]) == 0:
+            return []
+        return [_build_pool_state(raw) for raw in zpool_data["pools"].values()]
 
 
 async def get_importable_pools(uid: int) -> list[ImportablePool]:
