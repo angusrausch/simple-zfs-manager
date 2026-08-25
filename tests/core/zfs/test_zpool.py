@@ -123,16 +123,19 @@ async def test_list_pool(mock_run_command, load_cmd_json_fixture):
 @pytest.mark.asyncio
 @patch("app.core.zfs.zpool._build_pool_state")
 @patch("app.core.zfs.zpool.execute_zfs_command_json")
-async def test_list_pool(mock_execute, mock_build_state):
+@pytest.mark.parametrize(
+    "pool_name",
+    [None, "tank"]
+)
+async def test_list_pool_command(mock_execute, mock_build_state, pool_name):
     mock_execute.return_value = {"pools": {"tank": {}}}
     mock_build_state.return_value = "mock_state"
 
-    await list_pool(1000)
-    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "list", "-pj"])
-
-    pool_name = "tank"
     await list_pool(1000, pool_name)
-    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "list", "-pj", pool_name], pool_name)
+    if pool_name:
+        mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "list", "-pj", pool_name], pool_name)
+    else:
+        mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "list", "-pj"])
 
 
 @pytest.mark.asyncio
@@ -161,16 +164,19 @@ async def test_get_pool_statuss(mock_run_command, load_cmd_json_fixture):
 @pytest.mark.asyncio
 @patch("app.core.zfs.zpool._build_pool_state")
 @patch("app.core.zfs.zpool.execute_zfs_command_json")
-async def test_get_pool_status(mock_execute, mock_build_state):
+@pytest.mark.parametrize(
+    "pool_name",
+    [None, "tank"]
+)
+async def test_get_pool_status(mock_execute, mock_build_state, pool_name):
     mock_execute.return_value = {"pools": {"tank": {}}}
     mock_build_state.return_value = "mock_state"
 
-    await get_pool_status(1000)
-    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "status", "-pj"])
-
-    pool_name = "tank"
-    await get_pool_status(1000, pool_name)
-    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "status", "-pj", pool_name], pool_name)
+    await get_pool_status(1000, pool_name=pool_name)
+    if not pool_name:
+        mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "status", "-pj"])
+    else:
+        mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "status", "-pj", pool_name], pool_name)
 
 
 @pytest.mark.asyncio
@@ -220,24 +226,37 @@ async def test_get_importable_pools_char_id(mock_run_command, load_cmd_json_fixt
 
 
 @pytest.mark.asyncio
-@patch("app.core.zfs.zpool.execute_zfs_command") 
-async def test_import_pool(mock_execute):
+@patch("app.core.zfs.zpool.execute_zfs_command")
+@pytest.mark.parametrize(
+    "custom_name",
+    [None, "new_tank"]
+)
+async def test_import_pool(mock_execute, custom_name):
     pool_id = 4387097328
     
-    assert await import_pool(1000, pool_id) is None
-    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "import", "4387097328"], pool_id)
+    assert await import_pool(1000, pool_id, custom_name) is None
 
-    assert await import_pool(1000, pool_id, custom_name="new_tank") is None
-    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "import", "4387097328", "new_tank"], pool_id)
+    expected_command = [settings.ZPOOL_BINARY, "import", "4387097328"]
+    if custom_name:
+        expected_command.append(custom_name)
+    mock_execute.assert_called_with(1000, expected_command, pool_id)
 
 
 @pytest.mark.asyncio
-@patch("app.core.zfs.zpool.execute_zfs_command") 
-async def test_export_pool(mock_execute):
+@patch("app.core.zfs.zpool.execute_zfs_command")
+@pytest.mark.parametrize(
+    "force",
+    [False, True]
+)
+async def test_export_pool(mock_execute, force):
     pool_name = "tank"
     
-    assert await export_pool(1000, pool_name) is None
-    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "export", pool_name], pool_name)
+    assert await export_pool(1000, pool_name, force=force) is None
+
+    expected_command = [settings.ZPOOL_BINARY, "export", pool_name]
+    if force:
+        expected_command.append("-f")
+    mock_execute.assert_called_with(1000, expected_command, pool_name)
 
 
 @pytest.mark.asyncio
@@ -272,15 +291,21 @@ async def test_create_pool(mock_execute):
 
 
 @pytest.mark.asyncio
-@patch("app.core.zfs.zpool.execute_zfs_command") 
-async def test_destroy_pool(mock_execute):
+@patch("app.core.zfs.zpool.execute_zfs_command")
+@pytest.mark.parametrize(
+    "force",
+    [False, True]
+)
+async def test_destroy_pool(mock_execute, force):
     pool_name = "tank"
     
-    assert await destroy_pool(1000, pool_name) is None
-    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "destroy", pool_name], pool_name)
+    assert await destroy_pool(1000, pool_name, force=force) is None
 
-    assert await destroy_pool(1000, pool_name, force=True) is None
-    mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "destroy", "-f", pool_name], pool_name)
+    expected_command = [settings.ZPOOL_BINARY, "destroy"]
+    if force:
+        expected_command.append("-f")
+    expected_command.append(pool_name)
+    mock_execute.assert_called_with(1000, expected_command, pool_name)
 
 
 @pytest.mark.asyncio

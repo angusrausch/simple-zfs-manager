@@ -81,8 +81,10 @@ async def import_pool(uid: int, id: int, custom_name: str = None):
     await execute_zfs_command(uid, command, id)
 
 
-async def export_pool(uid: int, name: str):
+async def export_pool(uid: int, name: str, force: bool = False):
     command = [settings.ZPOOL_BINARY, "export", name]
+    if force:
+        command.append("-f")
     await execute_zfs_command(uid, command, name)
 
 
