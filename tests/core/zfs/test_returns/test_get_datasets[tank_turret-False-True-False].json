@@ -1,0 +1,123 @@
+{
+  "output_version": {
+    "command": "zfs list",
+    "vers_major": 0,
+    "vers_minor": 1
+  },
+  "datasets": {
+    "tank/turret@second": {
+      "name": "tank/turret@second",
+      "type": "SNAPSHOT",
+      "pool": "tank",
+      "createtxg": "40",
+      "dataset": "tank/turret",
+      "snapshot_name": "second",
+      "properties": {
+        "used": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "available": {
+          "value": "-",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mountpoint": {
+          "value": "-",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        }
+      }
+    },
+    "tank/turret@third": {
+      "name": "tank/turret@third",
+      "type": "SNAPSHOT",
+      "pool": "tank",
+      "createtxg": "44",
+      "dataset": "tank/turret",
+      "snapshot_name": "third",
+      "properties": {
+        "used": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "available": {
+          "value": "-",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mountpoint": {
+          "value": "-",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        }
+      }
+    },
+    "tank/turret@fifth": {
+      "name": "tank/turret@fifth",
+      "type": "SNAPSHOT",
+      "pool": "tank",
+      "createtxg": "48",
+      "dataset": "tank/turret",
+      "snapshot_name": "fifth",
+      "properties": {
+        "used": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "available": {
+          "value": "-",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mountpoint": {
+          "value": "-",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+  pool: fish
+    id: 1123
+ state: ONLINE
+action: The pool can be imported using its name or numeric identifier.
+config:
+
+	fish        ONLINE
+	  raidz1-0  ONLINE
+	    sdc     ONLINE
+	    sdd     ONLINE
+
+  pool: tank
+    id: 1234
+ state: UNAVAIL
+action: The pool can be imported using its name or numeric identifier.
+config:
+
+	tank        ONLINE
+	  raidz1-0  ONLINE
+	    sda     ONLINE
+	    sdb     ONLINE

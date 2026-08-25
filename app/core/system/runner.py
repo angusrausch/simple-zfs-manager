@@ -1,11 +1,14 @@
+import asyncio
 import os
 import logging
 import shlex
 import subprocess
 
 audit_logger = logging.getLogger("app.audit")
+DEFAULT_TIMEOUT = 20
 
-def run_command(uid: int, command: list[str], timeout: int = 20) -> tuple[int, str]:
+
+def run_command(uid: int, command: list[str], timeout: int = DEFAULT_TIMEOUT) -> tuple[int, str]:
     command_str = " ".join(shlex.quote(str(item)) for item in command)
     audit_logger.info(f"[CMD] User {uid} requested command: {command_str}")
 
@@ -49,3 +52,7 @@ def run_command(uid: int, command: list[str], timeout: int = 20) -> tuple[int, s
         audit_logger.info(f"[CMD] Command succeeded for User {uid}")
 
     return return_code, output
+
+
+async def async_run_command(uid: int, command: list[str], timeout: int = DEFAULT_TIMEOUT) -> tuple[int, str]:
+    return await asyncio.to_thread(run_command, uid, command, timeout)

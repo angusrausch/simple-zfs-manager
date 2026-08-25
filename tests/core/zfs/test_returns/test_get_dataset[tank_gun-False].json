@@ -1,0 +1,45 @@
+{
+  "output_version": {
+    "command": "zfs list",
+    "vers_major": 0,
+    "vers_minor": 1
+  },
+  "datasets": {
+    "tank/gun": {
+      "name": "tank/gun",
+      "type": "FILESYSTEM",
+      "pool": "tank",
+      "createtxg": "79",
+      "properties": {
+        "used": {
+          "value": "33660",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "available": {
+          "value": "460172530545",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "33660",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mountpoint": {
+          "value": "/tank/gun",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        }
+      }
+    }
+  }
+}
