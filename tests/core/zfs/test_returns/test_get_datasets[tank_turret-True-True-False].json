@@ -1,0 +1,85 @@
+{
+  "output_version": {
+    "command": "zfs list",
+    "vers_major": 0,
+    "vers_minor": 1
+  },
+  "datasets": {
+    "tank/turret@now": {
+      "name": "tank/turret@now",
+      "type": "SNAPSHOT",
+      "pool": "tank",
+      "createtxg": "6329",
+      "dataset": "tank/turret",
+      "snapshot_name": "now",
+      "properties": {
+        "used": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "available": {
+          "value": "-",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mountpoint": {
+          "value": "-",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        }
+      }
+    },
+    "tank/turret@future": {
+      "name": "tank/turret@future",
+      "type": "SNAPSHOT",
+      "pool": "tank",
+      "createtxg": "7990",
+      "dataset": "tank/turret",
+      "snapshot_name": "future",
+      "properties": {
+        "used": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "available": {
+          "value": "-",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mountpoint": {
+          "value": "-",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        }
+      }
+    }
+  }
+}

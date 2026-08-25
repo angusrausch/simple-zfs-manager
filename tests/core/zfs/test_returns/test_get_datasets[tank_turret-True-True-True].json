@@ -1,0 +1,1455 @@
+{
+  "output_version": {
+    "command": "zfs get",
+    "vers_major": 0,
+    "vers_minor": 1
+  },
+  "datasets": {
+    "tank/turret@now": {
+      "name": "tank/turret@now",
+      "type": "SNAPSHOT",
+      "pool": "tank",
+      "createtxg": "6329",
+      "dataset": "tank/turret",
+      "snapshot_name": "now",
+      "properties": {
+        "type": {
+          "value": "snapshot",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "creation": {
+          "value": "1787549524",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "used": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "compressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "devices": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "exec": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "setuid": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "createtxg": {
+          "value": "6329",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "xattr": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "version": {
+          "value": "5",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "utf8only": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "normalization": {
+          "value": "none",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "casesensitivity": {
+          "value": "sensitive",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "nbmand": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "guid": {
+          "value": "7659594457603237902",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "primarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "secondarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defer_destroy": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "userrefs": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "objsetid": {
+          "value": "395",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mlslabel": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refcompressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "written": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalreferenced": {
+          "value": "12288",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "acltype": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "context": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "fscontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "rootcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "encryption": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "prefetch": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        }
+      }
+    },
+    "tank/turret@future": {
+      "name": "tank/turret@future",
+      "type": "SNAPSHOT",
+      "pool": "tank",
+      "createtxg": "7990",
+      "dataset": "tank/turret",
+      "snapshot_name": "future",
+      "properties": {
+        "type": {
+          "value": "snapshot",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "creation": {
+          "value": "1787558013",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "used": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "compressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "devices": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "exec": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "setuid": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "createtxg": {
+          "value": "7990",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "xattr": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "version": {
+          "value": "5",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "utf8only": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "normalization": {
+          "value": "none",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "casesensitivity": {
+          "value": "sensitive",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "nbmand": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "guid": {
+          "value": "11313332944485791437",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "primarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "secondarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defer_destroy": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "userrefs": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "objsetid": {
+          "value": "177",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mlslabel": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refcompressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "written": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalreferenced": {
+          "value": "12288",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "acltype": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "context": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "fscontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "rootcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "encryption": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "prefetch": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        }
+      }
+    },
+    "tank/turret@tonight": {
+      "name": "tank/turret@tonight",
+      "type": "SNAPSHOT",
+      "pool": "tank",
+      "createtxg": "15966",
+      "dataset": "tank/turret",
+      "snapshot_name": "tonight",
+      "properties": {
+        "type": {
+          "value": "snapshot",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "creation": {
+          "value": "1787637422",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "used": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "33704",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "compressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "devices": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "exec": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "setuid": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "createtxg": {
+          "value": "15966",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "xattr": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "version": {
+          "value": "5",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "utf8only": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "normalization": {
+          "value": "none",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "casesensitivity": {
+          "value": "sensitive",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "nbmand": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "guid": {
+          "value": "7725102444666224699",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "primarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "secondarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defer_destroy": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "userrefs": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "objsetid": {
+          "value": "16",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mlslabel": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refcompressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "written": {
+          "value": "21448",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalreferenced": {
+          "value": "12288",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "acltype": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "context": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "fscontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "rootcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "encryption": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "prefetch": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        }
+      }
+    },
+    "tank/turret/locked@tonight": {
+      "name": "tank/turret/locked@tonight",
+      "type": "SNAPSHOT",
+      "pool": "tank",
+      "createtxg": "15966",
+      "dataset": "tank/turret/locked",
+      "snapshot_name": "tonight",
+      "properties": {
+        "type": {
+          "value": "snapshot",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "creation": {
+          "value": "1787637422",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "used": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "113368",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "compressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "devices": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "exec": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "setuid": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "createtxg": {
+          "value": "15966",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "xattr": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "version": {
+          "value": "5",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "utf8only": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "normalization": {
+          "value": "none",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "casesensitivity": {
+          "value": "sensitive",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "nbmand": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "guid": {
+          "value": "10804971275996116160",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "primarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "secondarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defer_destroy": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "userrefs": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "objsetid": {
+          "value": "20",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mlslabel": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refcompressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "written": {
+          "value": "113368",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalreferenced": {
+          "value": "50176",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "acltype": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "context": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "fscontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "rootcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "encryption": {
+          "value": "aes-256-gcm",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "encryptionroot": {
+          "value": "tank/turret/locked",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "keystatus": {
+          "value": "available",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "prefetch": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        }
+      }
+    },
+    "tank/turret/shell@tomorrow": {
+      "name": "tank/turret/shell@tomorrow",
+      "type": "SNAPSHOT",
+      "pool": "tank",
+      "createtxg": "15963",
+      "dataset": "tank/turret/shell",
+      "snapshot_name": "tomorrow",
+      "properties": {
+        "type": {
+          "value": "snapshot",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "creation": {
+          "value": "1787637409",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "used": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "113368",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "compressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "devices": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "exec": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "setuid": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "createtxg": {
+          "value": "15963",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "xattr": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "version": {
+          "value": "5",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "utf8only": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "normalization": {
+          "value": "none",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "casesensitivity": {
+          "value": "sensitive",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "nbmand": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "guid": {
+          "value": "17660081202210676186",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "primarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "secondarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defer_destroy": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "userrefs": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "objsetid": {
+          "value": "12",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mlslabel": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refcompressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "written": {
+          "value": "113368",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalreferenced": {
+          "value": "50176",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "acltype": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "context": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "fscontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "rootcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "encryption": {
+          "value": "aes-256-gcm",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "encryptionroot": {
+          "value": "tank/turret/shell",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "keystatus": {
+          "value": "unavailable",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "prefetch": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        }
+      }
+    },
+    "tank/turret/shell@tonight": {
+      "name": "tank/turret/shell@tonight",
+      "type": "SNAPSHOT",
+      "pool": "tank",
+      "createtxg": "15966",
+      "dataset": "tank/turret/shell",
+      "snapshot_name": "tonight",
+      "properties": {
+        "type": {
+          "value": "snapshot",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "creation": {
+          "value": "1787637422",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "used": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "referenced": {
+          "value": "113368",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "compressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "devices": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "exec": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "setuid": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "createtxg": {
+          "value": "15966",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "xattr": {
+          "value": "on",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "version": {
+          "value": "5",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "utf8only": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "normalization": {
+          "value": "none",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "casesensitivity": {
+          "value": "sensitive",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "nbmand": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "guid": {
+          "value": "4662350716372499182",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "primarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "secondarycache": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defer_destroy": {
+          "value": "off",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "userrefs": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "objsetid": {
+          "value": "18",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "mlslabel": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "refcompressratio": {
+          "value": "1.00",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "written": {
+          "value": "0",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "logicalreferenced": {
+          "value": "50176",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "acltype": {
+          "value": "off",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "context": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "fscontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "defcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "rootcontext": {
+          "value": "none",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        },
+        "encryption": {
+          "value": "aes-256-gcm",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "encryptionroot": {
+          "value": "tank/turret/shell",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "keystatus": {
+          "value": "unavailable",
+          "source": {
+            "type": "NONE",
+            "data": "-"
+          }
+        },
+        "prefetch": {
+          "value": "all",
+          "source": {
+            "type": "DEFAULT",
+            "data": "-"
+          }
+        }
+      }
+    }
+  }
+}

@@ -56,7 +56,7 @@ def create_lock_dir():
 def load_cmd_json_fixture(request):
     test_dir = Path(request.module.__file__).parent
     
-    test_name = request.node.name 
+    test_name = request.node.name.replace("/", "_")
     
     fixture_dir = fixture_path = test_dir / "test_returns"
 

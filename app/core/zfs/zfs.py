@@ -1,7 +1,7 @@
 import json
 import logging
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 from app.core.zfs.utils import execute_zfs_command, execute_zfs_command_json, execute_zfs_replication
 from app.core.zfs.models import DatasetState, DatasetType
@@ -11,20 +11,20 @@ from app.core.errors import ZFSCommandFailedError
 audit_logger = logging.getLogger("app.audit")
 
 
-async def create_dataset(uid: int, parent: str, dataset_name: str, create_parents: bool = False, encryption: str = None):
+async def create_dataset(uid: int, parent: str, dataset_name: str, create_parents: bool = False, encryption_key: str = None):
     full_dataset_name = parent + "/" + dataset_name
     command = [settings.ZFS_BINARY, "create", full_dataset_name]
     if create_parents:
         command.append("-p")
 
-    if not encryption:
+    if not encryption_key:
         await execute_zfs_command(uid, command, full_dataset_name)
     else:
         with tempfile.NamedTemporaryFile(delete=True) as password_file:
-            password_file.write(encryption.encode("utf-8"))
+            password_file.write(encryption_key.encode("utf-8"))
             password_file.flush()
 
-            command += ["-o", "encryption=on", "-o", "keyformat=passphrase", "-o", f"keylocation=file:///{password_file.name}"]
+            command.extend(["-o", "encryption=on", "-o", "keyformat=passphrase", "-o", f"keylocation=file:///{password_file.name}"])
 
             await execute_zfs_command(uid, command, full_dataset_name)
 
@@ -37,27 +37,30 @@ async def destroy_dataset(uid: int, dataset_name: str, recursive: bool = False):
     await execute_zfs_command(uid, command, dataset_name)
 
 
-async def list_datasets(uid: int) -> list[DatasetState]:
-    command = [settings.ZFS_BINARY, "list", "-pj"]
-    dataset_data = await execute_zfs_command_json(uid, command)
-    
+async def get_dataset(uid: int, dataset_name: str | None = None, child_datasets: bool = False, snapshot: bool = False, detailed: bool = False) -> list[DatasetState]:
+    command = [settings.ZFS_BINARY]
+    if detailed:
+        command.extend(["get", "all"])
+    else:
+        command.append("list")
+    command.append("-pj")
+
+    if snapshot:
+        command.extend(["-t", "snapshot"])
+    if child_datasets:
+        command.append("-r")
+    if dataset_name:
+        command.append(dataset_name)
+
+    dataset_data = await execute_zfs_command_json(uid, command, dataset_name)
     if not dataset_data or "datasets" not in dataset_data:
-        return []
+            return []
+    dataset_states = [_build_dataset_state(raw, detailed=detailed) for raw in dataset_data["datasets"].values()]
 
-    return [_build_dataset_state(raw) for raw in dataset_data["datasets"].values()]
-
-
-async def list_child_datasets(uid: int, dataset_name: str) -> list[DatasetState]:
-    command = [settings.ZFS_BINARY, "list", "-pjr", dataset_name]
-    dataset_data = await execute_zfs_command_json(uid, command)
-
-    return [_build_dataset_state(raw) for raw in dataset_data["datasets"].values()]
-
-
-async def list_dataset(uid: int, dataset_name: str) -> DatasetState:
-    command = [settings.ZFS_BINARY, "list", "-pj", dataset_name]
-    dataset_data = await execute_zfs_command_json(uid, command)
-    return _build_dataset_state(dataset_data["datasets"][dataset_name])
+    if dataset_name and not any([child_datasets, snapshot]):
+        return dataset_states[0]
+    else:
+        return dataset_states
 
 
 async def rename_dataset(uid: int, old_name: str, new_name: str, create_parents: bool = False):
@@ -86,26 +89,13 @@ async def restore_snapshot(uid: int, dataset_name: str, snapshot_name: str, dest
     await execute_zfs_command(uid, command, dataset_name)
 
 
-async def list_snapshots(uid: int, dataset_name: str = None) -> list[DatasetState]:
-    command = [settings.ZFS_BINARY, "list", "-pj", "-t", "snapshot"]
-    if dataset_name:
-        command.append(dataset_name)
-
-    dataset_data = await execute_zfs_command_json(uid, command, dataset_name)
-    
-    if not dataset_data or "datasets" not in dataset_data:
-        return []
-
-    return [_build_dataset_state(raw) for raw in dataset_data["datasets"].values()]
-
-
-async def mount_dataset(uid: int, dataset_name: str, recursive: bool = False, encryption: str = None):
+async def mount_dataset(uid: int, dataset_name: str, recursive: bool = False, encryption_key: str = None):
     command = [settings.ZFS_BINARY, "mount", dataset_name]
     if recursive:
         command.append("-R")
-    if encryption: 
-        await load_key(uid, dataset_name, encryption)
-    await execute_zfs_command(uid, command)
+    if encryption_key: 
+        await load_key(uid, dataset_name, encryption_key)
+    await execute_zfs_command(uid, command, dataset_name)
 
 
 async def unmount_dataset(uid: int, dataset_name: str, force: bool = False, unload_key: bool = False):
@@ -115,12 +105,12 @@ async def unmount_dataset(uid: int, dataset_name: str, force: bool = False, unlo
     if unload_key:
         command.append("-u")
 
-    await execute_zfs_command(uid, command)
+    await execute_zfs_command(uid, command, dataset_name)
 
 
-async def load_key(uid: int, dataset_name: str, key: str):
+async def load_key(uid: int, dataset_name: str, encryption_key: str):
     with tempfile.NamedTemporaryFile(delete=True) as password_file:
-        password_file.write(key.encode("utf-8"))
+        password_file.write(encryption_key.encode("utf-8"))
         password_file.flush()
 
         command = [settings.ZFS_BINARY, "load-key", dataset_name, "-L", f"file:///{password_file.name}"]
@@ -136,28 +126,14 @@ async def unload_key(uid: int, dataset_name: str, recursive: bool = False):
     await execute_zfs_command(uid, command, dataset_name)
 
 
-async def get_dataset(uid: int, dataset_name: str) -> DatasetState:
-    command = [settings.ZFS_BINARY, "get", "all", "-pj", dataset_name]
-    
-    dataset_data = await execute_zfs_command_json(uid, command, dataset_name)
-
-    return _build_dataset_state(dataset_data["datasets"][dataset_name], detailed=True)
-
-
-async def get_datasets(uid: int) -> DatasetState:
-    command = [settings.ZFS_BINARY, "get", "all", "-pj"]
-    
-    dataset_data = await execute_zfs_command_json(uid, command)
-
-    return [_build_dataset_state(raw, detailed=True) for raw in dataset_data["datasets"].values()]
-
-
-async def replicate_snapshot(uid: int, snapshot: str, target: str, remote_host: str = None, incremental_from: str = None, recursive: bool = False, remote_sudo: bool = False):
+async def replicate_snapshot(uid: int, snapshot: str, target: str, remote_host: str = None, incremental_from: str = None, recursive: bool = False, remote_sudo: bool = False, encrypted: bool = False):
     send_flag = "-R" if recursive else "-p"
     send_command = [settings.ZFS_BINARY, "send", send_flag]
     
+    if encrypted:
+        send_command.append("-w")
     if incremental_from:
-        send_command += ["-i", incremental_from]
+        send_command.extend(["-i", incremental_from])
     send_command.append(snapshot)
 
     if remote_host:
@@ -166,7 +142,7 @@ async def replicate_snapshot(uid: int, snapshot: str, target: str, remote_host: 
             recv_command.append("sudo")
     else :
         recv_command = []
-    recv_command += [settings.ZFS_BINARY, "receive", "-F", target]
+    recv_command.extend([settings.ZFS_BINARY, "receive", "-F", target])
 
     await execute_zfs_replication(uid, send_command, recv_command, snapshot, target)
 
@@ -186,6 +162,7 @@ def _value_if_key_exists(dict: dict, key: str, sub_key: str = None, bool_compari
         except ValueError:
             return None
     return value
+
 
 def _build_dataset_state(data: dict, detailed: bool = False) -> DatasetState:
     properties = data["properties"]

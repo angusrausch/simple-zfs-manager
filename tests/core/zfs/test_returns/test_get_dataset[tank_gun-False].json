@@ -5,42 +5,6 @@
     "vers_minor": 1
   },
   "datasets": {
-    "tank": {
-      "name": "tank",
-      "type": "FILESYSTEM",
-      "pool": "tank",
-      "createtxg": "1",
-      "properties": {
-        "used": {
-          "value": "289935",
-          "source": {
-            "type": "NONE",
-            "data": "-"
-          }
-        },
-        "available": {
-          "value": "460172530545",
-          "source": {
-            "type": "NONE",
-            "data": "-"
-          }
-        },
-        "referenced": {
-          "value": "33660",
-          "source": {
-            "type": "NONE",
-            "data": "-"
-          }
-        },
-        "mountpoint": {
-          "value": "/tank",
-          "source": {
-            "type": "DEFAULT",
-            "data": "-"
-          }
-        }
-      }
-    },
     "tank/gun": {
       "name": "tank/gun",
       "type": "FILESYSTEM",
