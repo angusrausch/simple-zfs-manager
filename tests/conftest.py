@@ -64,5 +64,16 @@ def load_cmd_json_fixture(request):
         return (fixture_dir / f"{test_name}.json").read_text(encoding="utf-8")
     elif (fixture_dir / f"{test_name}.txt").exists():
         return (fixture_dir / f"{test_name}.txt").read_text(encoding="utf-8")
+    elif (fixture_dir / f"{test_name}.py").exists():
+        source = (fixture_dir / f"{test_name}.py").read_text(encoding="utf-8")
+        local_vars = {}
+        try:
+            exec(source, globals(), local_vars) 
+        except Exception as e:
+            pytest.fail(f"Error executing Python fixture {test_name}: {e}")
+        if "value" in local_vars:
+            return local_vars["value"]
+        else:
+            pytest.fail(f"Python fixture found, but 'value' variable is missing in: {test_name}")
     else:
         pytest.fail(f"Missing expected test fixture file at: {fixture_path}")
