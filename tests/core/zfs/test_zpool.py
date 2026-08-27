@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from app.core.zfs.zpool import list_pool, get_pool_status, get_importable_pools, import_pool, export_pool, create_pool, destroy_pool, scrub_pool, _build_pool_state
+from app.core.zfs.zpool import list_pool, get_pool_status, get_importable_pools, import_pool, export_pool, create_pool, destroy_pool, scrub_pool, get_used_disks, _build_pool_state
 from app.core.zfs.models import PoolState, ImportablePool, RaidType
 from app.core.errors import ZFSCommandFailedError
 from app.core.config import settings
@@ -315,3 +315,13 @@ async def test_scrub_pool(mock_execute):
     
     assert await scrub_pool(1000, pool_name) is None
     mock_execute.assert_called_with(1000, [settings.ZPOOL_BINARY, "scrub", pool_name], pool_name)
+
+
+@pytest.mark.asyncio
+@patch("app.core.zfs.zpool.get_pool_status") 
+async def test_get_used_disks(mock_status, load_cmd_json_fixture):
+    mock_status.return_value = load_cmd_json_fixture
+    
+    used_disks = await get_used_disks(1000)
+
+    assert used_disks == ['raidz1-0', 'sda', 'sdb']

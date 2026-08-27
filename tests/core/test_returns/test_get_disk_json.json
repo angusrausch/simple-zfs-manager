@@ -1,0 +1,35 @@
+{
+   "blockdevices": [
+      {
+         "name": "sdd",
+         "size": 250059350016,
+         "mountpoint": null,
+         "children": [
+            {
+               "name": "sdd1",
+               "size": 250049724416,
+               "mountpoint": null
+            },{
+               "name": "sdd9",
+               "size": 8388608,
+               "mountpoint": null
+            }
+         ]
+      },{
+         "name": "mmcblk0",
+         "size": 127865454592,
+         "mountpoint": null,
+         "children": [
+            {
+               "name": "mmcblk0p1",
+               "size": 536870912,
+               "mountpoint": "/boot/firmware"
+            },{
+               "name": "mmcblk0p2",
+               "size": 63319310336,
+               "mountpoint": "/"
+            }
+         ]
+      }
+   ]
+}

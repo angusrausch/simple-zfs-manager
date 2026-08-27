@@ -117,6 +117,20 @@ async def scrub_pool(uid: int, pool_name: str):
     await execute_zfs_command(uid, command, pool_name)
 
 
+async def get_used_disks(uid: int) -> list[str]:
+    pools = await get_pool_status(uid)
+    return [disk for pool in pools for disk in _check_vdev_tree_disks(pool.vdev_tree)]
+
+
+def _check_vdev_tree_disks(vdev_tree):
+    if not vdev_tree.vdevs:
+        return
+
+    for key, value in vdev_tree.vdevs.items():
+        yield key
+        yield from _check_vdev_tree_disks(value)
+
+
 def _parse_vdev_tree(vdev_name: str, vdev_data: dict) -> VDevNode:
     """Helper to recursively parse the nested vdev JSON tree."""
     child_vdevs = None
