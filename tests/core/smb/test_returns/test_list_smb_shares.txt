@@ -1,0 +1,21 @@
+[angus]
+	comment = testing share performance
+	path = /fast/angus/
+	read only = no
+	browseable = yes
+	valid users = angus
+
+[test]
+	path = /fast/test/
+	read only = yes
+	browseable = false
+	valid users = angus, test_samaba_user
+	create mask = 0500
+	directory mask = 0500
+
+[test2]
+	path = /fast/test2/
+	read only = yes
+	browseable = false
+	create mask = 0500
+	directory mask = 0500

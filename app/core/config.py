@@ -17,6 +17,7 @@ class Settings:
     ZFS_BINARY: str = os.getenv("ZFS_BINARY_PATH", "/usr/sbin/zfs")
     ZPOOL_BINARY: str = os.getenv("ZPOOL_BINARY_PATH", "/usr/sbin/zpool")
     SUDO_BINARY: str = os.getenv("SUDO_BINARY_PATH", "/usr/bin/sudo")
+    NET_BINARY: str = os.getenv("NET_BINARY_PATH", "/usr/bin/net")
     
     LOG_LOCATION: Path = Path(os.getenv("LOG_LOCATION", "/var/log/simple-zfs-viewer.log"))
     LOG_LOCATION.parent.mkdir(parents=True, exist_ok=True)
