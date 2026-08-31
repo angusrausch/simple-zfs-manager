@@ -4,7 +4,7 @@ from pathlib import Path
 
 from app.core.config import settings
 from app.core.system.runner import async_run_command
-from app.core.smb.models import SmbUser, SmbShare
+from app.core.smb.models import SmbShare
 
 audit_logger = logging.getLogger("app.audit")
 
@@ -50,8 +50,8 @@ async def _execute_smb_command(uid: int, command: list[str]) -> str:
     status, return_str = await async_run_command(uid, command)
 
     if status == 127:
-        audit_logger.error(f"[CMD] Command {command[0]} not found, ensure it is installed")
-        raise FileNotFoundError(f"Command {command[0]} not found, ensure it is installed")
+        audit_logger.error(f"[CMD] Command `{command[0]}` not found, ensure it is installed")
+        raise FileNotFoundError(f"Command `{command[0]}` not found, ensure it is installed")
     elif status in (126, 255):
         audit_logger.error(f"[CMD] Invalid Permissions: {return_str}")
         raise PermissionError(f"Invalid Permissions: {return_str}")
