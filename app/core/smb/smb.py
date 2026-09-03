@@ -23,12 +23,27 @@ async def list_shares(uid: int) -> list[SmbShare]:
 async def get_share(uid: int, share_name: str) -> SmbShare:
     command = ["showshare", share_name]
 
-    return_str = await _execute_smb_command(uid, command)
+    return_str = await _execute_smb_command(uid, command, share_name)
 
     config = ConfigParser(interpolation=None)
     config.read_string(return_str)
 
     return _build_smb_share(config[share_name])
+
+
+async def create_share(uid: int, share_name: str, share_path: Path, writeable: bool = False, guest_ok: bool = False):
+    writeable_param = "writeable=y" if writeable else "writeable=n"
+    guest_ok_param = "guest_ok=y" if guest_ok else "guest_ok=n"
+    
+    command = ["addshare", share_name, str(share_path), writeable_param, guest_ok_param]
+
+    await _execute_smb_command(uid, command, share_name)
+
+
+async def _set_param(uid: int, share_name: str, param_str: str, param_value_str: str):
+    command = ["setparm", share_name, param_str, param_value_str]
+
+    await _execute_smb_command(uid, command, share_name)
 
 
 def _build_smb_share(config: ConfigParser):
@@ -66,10 +81,13 @@ async def _execute_smb_command(uid: int, command_args: list[str], share_name: st
     if status == 127:
         audit_logger.error(f"[CMD] Command `{full_command[0]}` not found, ensure it is installed")
         raise FileNotFoundError(f"Command `{full_command[0]}` not found, ensure it is installed")
-    elif status in (126, 255):
+    elif status == 126:
         audit_logger.error(f"[CMD] Invalid Permissions: {return_str}")
         raise PermissionError(f"Invalid Permissions: {return_str}")
-    elif status == 1:
+    elif status != 0:
+        if "WERR_ACCESS_DENIED" in return_str:
+            audit_logger.error(f"[CMD] Invalid Permissions: {return_str}")
+            raise PermissionError(f"Invalid Permissions: {return_str}")
         if share_name:
             if "SBC_ERR_NO_SUCH_SERVICE" in return_str:
                 audit_logger.error(f"[CMD] Share does not exist: '{share_name}'")

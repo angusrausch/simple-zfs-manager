@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch
 from pathlib import Path
 
-from app.core.smb.smb import list_shares, get_share, _execute_smb_command
+from app.core.smb.smb import list_shares, get_share, create_share, _execute_smb_command
 from app.core.smb.models import SmbShare
 
 @pytest.mark.asyncio
@@ -68,3 +68,43 @@ async def test_execute_smb_command_error(mock_run, return_code, return_message, 
 
     assert f"[CMD] {error_message}" in caplog.text
     assert error_message in str(e.value)
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb._execute_smb_command")
+@pytest.mark.parametrize(
+    "share_name, share_path, writable, guest_ok",
+    [
+        ("test", "/test/path", False, False),
+        ("test_two", "/test/path/two", False, False),
+        ("test", "/test/path", True, False),
+        ("test", "/test/path", False, True),
+        ("test", "/test/path", True, True),
+    ]
+)
+async def test_create_share(mock_run, share_name, share_path, writable, guest_ok):
+    assert await create_share(1000, share_name, share_path, writable, guest_ok) == None
+    
+    if writable:
+        writeable_param = "writeable=y"
+    else:
+        writeable_param = "writeable=n"
+
+    if guest_ok:
+        guest_ok_param = "guest_ok=y"
+    else:
+        guest_ok_param = "guest_ok=n"
+
+    mock_run.assert_called_once()
+    mock_run.assert_called_with(1000, ["addshare", share_name, share_path, writeable_param, guest_ok_param], share_name)
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb.async_run_command")
+async def test_execute_smb_command_builds_command(mock_execute):
+    mock_execute.return_value = (0, "success")
+
+    await _execute_smb_command(1000, ["list", "more_list"])
+    
+    mock_execute.assert_called_once()
+    mock_execute.assert_called_with(1000, ["/usr/bin/net", "conf", "list", "more_list"])
