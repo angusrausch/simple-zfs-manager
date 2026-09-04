@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch
 from pathlib import Path
 
-from app.core.smb.smb import list_shares, get_share, create_share, _execute_smb_command
+from app.core.smb.smb import list_shares, get_share, create_share, _get_param, _set_param, add_share_user, del_share_user, _execute_smb_command
 from app.core.smb.models import SmbShare
 
 @pytest.mark.asyncio
@@ -108,3 +108,85 @@ async def test_execute_smb_command_builds_command(mock_execute):
     
     mock_execute.assert_called_once()
     mock_execute.assert_called_with(1000, ["/usr/bin/net", "conf", "list", "more_list"])
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb._execute_smb_command")
+async def test_get_parm(mock_execute):
+    mock_return = "angus, jeff"
+    mock_execute.return_value = mock_return
+
+    assert await _get_param(1000, "test_share", "valid users") == mock_return
+    
+    mock_execute.assert_called_once()
+    mock_execute.assert_called_with(1000, ["getparm", "test_share", "valid users"], "test_share")
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb._execute_smb_command")
+async def test_set_parm(mock_execute):
+    assert await _set_param(1000, "test_share", "public_ok", "y") is None
+    
+    mock_execute.assert_called_once()
+    mock_execute.assert_called_with(1000, ["setparm", "test_share", "public_ok", "y"], "test_share")
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb._set_param")
+@patch("app.core.smb.smb._get_param")
+@pytest.mark.parametrize(
+    "user, expected_arg",
+    [
+        ("peter", "angus, jeff, peter"), (["peter", "greg"], "angus, jeff, peter, greg")
+    ]
+)
+async def test_add_share_user(mock_get, mock_set, user, expected_arg):
+    mock_get.return_value = "angus, jeff"
+
+    assert await add_share_user(1000, "test_share", user) is None
+
+    mock_get.assert_called_once()
+    mock_get.assert_called_with(1000, "test_share", "valid users")
+
+    mock_set.assert_called_once()
+    mock_set.assert_called_with(1000, "test_share", "valid users", expected_arg)
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb._set_param")
+@patch("app.core.smb.smb._get_param")
+@pytest.mark.parametrize(
+    "user, expected_arg",
+    [
+        ("peter", "angus, jeff, greg"), (["peter", "greg"], "angus, jeff")
+    ]
+)
+async def test_del_share_user(mock_get, mock_set, user, expected_arg):
+    mock_get.return_value = "angus, jeff, peter, greg"
+
+    assert await del_share_user(1000, "test_share", user) is None
+
+    mock_get.assert_called_once()
+    mock_get.assert_called_with(1000, "test_share", "valid users")
+
+    mock_set.assert_called_once()
+    mock_set.assert_called_with(1000, "test_share", "valid users", expected_arg)
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb._get_param")
+@pytest.mark.parametrize(
+    "method, user, return_value",
+    [
+        (add_share_user, "peter", "angus, jeff, greg, peter"),
+        (del_share_user, "peter", "angus, jeff, greg"),
+        (add_share_user, ["tony", "peter"], "angus, jeff, greg, peter"),
+        (del_share_user, ["greg", "peter"], "angus, jeff, greg"),
+        (del_share_user, ["peter", "greg"], "angus, jeff, greg"),
+    ]
+)
+async def test_add_del_share_user_no_user(mock_get, method, user, return_value):
+    mock_get.return_value = return_value
+
+    with pytest.raises(ValueError):
+        await method(1000, "test_share", user)

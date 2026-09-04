@@ -40,6 +40,38 @@ async def create_share(uid: int, share_name: str, share_path: Path, writeable: b
     await _execute_smb_command(uid, command, share_name)
 
 
+async def add_share_user(uid: int, share_name: str, users: str | list[str]):
+    current_users = _build_smb_users(await _get_param(uid, share_name, "valid users"))
+
+    if type(users) == str:
+        users = [users]
+    for user in users:
+        if user in current_users:
+            raise ValueError(f"User \'{user}\' already present in share")
+        current_users.append(user)
+    
+    users_str = ", ".join(current_users)
+    await _set_param(uid, share_name, "valid users", users_str)
+
+
+async def del_share_user(uid: int, share_name: str, users: str):
+    current_users = _build_smb_users(await _get_param(uid, share_name, "valid users"))
+
+    if type(users) == str:
+        users = [users]
+    for user in users:
+        current_users.remove(user)
+
+    users_str = ", ".join(current_users)
+    await _set_param(uid, share_name, "valid users", users_str)
+
+
+async def _get_param(uid: int, share_name: str, param_str:str) -> str:
+    command = ["getparm", share_name, param_str]
+
+    return await _execute_smb_command(uid, command, share_name)
+
+
 async def _set_param(uid: int, share_name: str, param_str: str, param_value_str: str):
     command = ["setparm", share_name, param_str, param_value_str]
 
