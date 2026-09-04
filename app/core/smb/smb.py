@@ -66,6 +66,42 @@ async def del_share_user(uid: int, share_name: str, users: str):
     await _set_param(uid, share_name, "valid users", users_str)
 
 
+async def set_share_read_only(uid: int, share_name: str, value: bool):
+    if value:
+        await _set_param(uid, share_name, "read only", "yes")
+    else:
+        await _set_param(uid, share_name, "read only", "no")
+
+
+async def get_share_read_only(uid: int, share_name: str) -> bool:
+    read_only = await _get_param(uid, share_name, "read only")
+    return not read_only == "no"
+
+
+async def set_share_guest_ok(uid: int, share_name: str, value: bool):
+    if value:
+        await _set_param(uid, share_name, "guest ok", "yes")
+    else:
+        await _set_param(uid, share_name, "guest ok", "no")
+
+
+async def get_share_guest_ok(uid: int, share_name: str) -> bool:
+    guest_ok = await _get_param(uid, share_name, "guest ok")
+    return guest_ok == "yes"
+
+
+async def set_share_browseable(uid: int, share_name: str, value: bool):
+    if value:
+        await _set_param(uid, share_name, "browseable", "yes")
+    else:
+        await _set_param(uid, share_name, "browseable", "no")
+
+
+async def get_share_browseable(uid: int, share_name: str) -> bool:
+    browsable = await _get_param(uid, share_name, "browseable")
+    return not browsable == "no"
+
+
 async def _get_param(uid: int, share_name: str, param_str:str) -> str:
     command = ["getparm", share_name, param_str]
 
@@ -104,7 +140,7 @@ def _build_smb_users(users_str: str) -> list[str]:
     return [user.strip() for user in users_str.split(",")]
 
 
-async def _execute_smb_command(uid: int, command_args: list[str], share_name: str | None = None) -> str:
+async def _execute_smb_command(uid: int, command_args: list[str], share_name: str | None = None) -> str | None:
     base_command = [settings.NET_BINARY, "conf"]
     full_command = base_command + command_args
 
@@ -124,6 +160,8 @@ async def _execute_smb_command(uid: int, command_args: list[str], share_name: st
             if "SBC_ERR_NO_SUCH_SERVICE" in return_str:
                 audit_logger.error(f"[CMD] Share does not exist: '{share_name}'")
                 raise KeyError(f"Share does not exist: '{share_name}'")
+            if "Error: given parameter '" in return_str and "' is not set." in return_str:
+                return None
         audit_logger.error(f"[CMD] An error occured: {return_str}")
         raise Exception(f"An error occured: {return_str}")
 

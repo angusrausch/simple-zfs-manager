@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch
 from pathlib import Path
 
-from app.core.smb.smb import list_shares, get_share, create_share, _get_param, _set_param, add_share_user, del_share_user, _execute_smb_command
+from app.core.smb.smb import list_shares, get_share, create_share, _get_param, _set_param, add_share_user, del_share_user, _execute_smb_command, set_share_browseable, get_share_browseable, set_share_guest_ok, get_share_guest_ok, set_share_read_only, get_share_read_only
 from app.core.smb.models import SmbShare
 
 @pytest.mark.asyncio
@@ -68,6 +68,20 @@ async def test_execute_smb_command_error(mock_run, return_code, return_message, 
 
     assert f"[CMD] {error_message}" in caplog.text
     assert error_message in str(e.value)
+
+
+@pytest.mark.asyncio
+@patch("app.core.system.runner.run_command")
+@pytest.mark.parametrize(
+    "return_code, return_message, custom_return",
+    [
+        (255, "Error: given parameter 'browseable' is not set.", None),
+    ]
+)
+async def test_execute_smb_command_custom_return(mock_run, return_code, return_message, custom_return):
+    mock_run.return_value = (return_code, return_message)
+
+    assert await _execute_smb_command("1000", ["list"], share_name="test_share") == custom_return
 
 
 @pytest.mark.asyncio
@@ -190,3 +204,51 @@ async def test_add_del_share_user_no_user(mock_get, method, user, return_value):
 
     with pytest.raises(ValueError):
         await method(1000, "test_share", user)
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb._set_param")
+@pytest.mark.parametrize(
+    "method, param",
+    [
+        (set_share_browseable, "browseable"),
+        (set_share_guest_ok, "guest ok"),
+        (set_share_read_only, "read only")
+    ]
+)
+async def test_set_share_boolean(mock_execute, method, param):
+    assert await method(1000, "test_share", True) is None
+
+    mock_execute.assert_called_once()
+    mock_execute.assert_called_with(1000, "test_share", param, "yes")
+
+    mock_execute.reset_mock()
+
+    assert await method(1000, "test_share", False) is None
+
+    mock_execute.assert_called_once()
+    mock_execute.assert_called_with(1000, "test_share", param, "no")
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb._get_param")
+@pytest.mark.parametrize(
+    "method, param, default",
+    [
+        (get_share_browseable, "browseable", True),
+        (get_share_guest_ok, "guest ok", False),
+        (get_share_read_only, "read only", True)
+    ]
+)
+async def test_get_share_boolean(mock_execute, method, param, default):
+    mock_execute.return_value = "yes"
+    assert await method(1000, "test_share") is True
+
+    mock_execute.assert_called_once()
+    mock_execute.assert_called_with(1000, "test_share", param)
+
+    mock_execute.return_value = "no"
+    assert await method(1000, "test_share") is False
+
+    mock_execute.return_value = f"Error: given parameter '{param}' is not set."
+    assert await method(1000, "test_share") is default
