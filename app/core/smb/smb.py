@@ -5,6 +5,7 @@ from pathlib import Path
 from app.core.config import settings
 from app.core.system.runner import async_run_command
 from app.core.smb.models import SmbShare
+from app.utils.sanitise import sanitise_path
 
 audit_logger = logging.getLogger("app.audit")
 
@@ -34,8 +35,9 @@ async def get_share(uid: int, share_name: str) -> SmbShare:
 async def create_share(uid: int, share_name: str, share_path: Path, writeable: bool = False, guest_ok: bool = False):
     writeable_param = "writeable=y" if writeable else "writeable=n"
     guest_ok_param = "guest_ok=y" if guest_ok else "guest_ok=n"
+    safe_path = sanitise_path(share_path)
     
-    command = ["addshare", share_name, str(share_path), writeable_param, guest_ok_param]
+    command = ["addshare", share_name, str(safe_path), writeable_param, guest_ok_param]
 
     await _execute_smb_command(uid, command, share_name)
 
@@ -106,6 +108,18 @@ async def set_share_browseable(uid: int, share_name: str, value: bool):
 async def get_share_browseable(uid: int, share_name: str) -> bool:
     browsable = await _get_param(uid, share_name, "browseable")
     return not browsable == "no"
+
+
+async def get_share_path(uid: int, share_name: str) -> Path:
+    return Path(await _get_param(uid, share_name, "path"))
+
+
+async def set_share_path(uid: int, share_name: str, path: Path):
+    path = sanitise_path(path)
+    if not path.exists():
+        raise ValueError("Path does not exist. Please choose a different path or create this path and try again")
+
+    await _set_param(uid, share_name, "path", str(path))
 
 
 async def _get_param(uid: int, share_name: str, param_str:str) -> str:
