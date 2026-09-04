@@ -190,21 +190,41 @@ async def test_del_share_user(mock_get, mock_set, user, expected_arg):
 @pytest.mark.asyncio
 @patch("app.core.smb.smb._get_param")
 @pytest.mark.parametrize(
-    "method, user, return_value",
+    "user, return_value, outlier",
     [
-        (add_share_user, "peter", "angus, jeff, greg, peter"),
-        (del_share_user, "peter", "angus, jeff, greg"),
-        (add_share_user, ["tony", "peter"], "angus, jeff, greg, peter"),
-        (del_share_user, ["greg", "peter"], "angus, jeff, greg"),
-        (del_share_user, ["peter", "greg"], "angus, jeff, greg"),
+        ("peter", "angus, jeff, greg, peter", "peter"),
+        (["tony", "peter"], "angus, jeff, greg, peter", "peter"),
+        (["peter", "greg"], "angus, jeff, greg", "greg"),
     ]
 )
-async def test_add_del_share_user_no_user(mock_get, method, user, return_value):
+async def test_add_share_user_no_user(mock_get, user, return_value, outlier, caplog):
     mock_get.return_value = return_value
 
-    with pytest.raises(ValueError):
-        await method(1000, "test_share", user)
+    with pytest.raises(ValueError) as e:
+        await add_share_user(1000, "test_share", user)
 
+    assert f"[SMB] Attempted to add user \'{outlier}\' to `test_share` but user already present" in caplog.text
+    assert f"User \'{outlier}\' already present in share" in str(e.value)
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb._get_param")
+@pytest.mark.parametrize(
+    "user, return_value, outlier",
+    [
+        ("peter", "angus, jeff, greg", "peter"),
+        (["tony", "peter"], "angus, jeff, greg, peter", "tony"),
+        (["peter", "greg"], "angus, jeff, greg", "peter"),
+    ]
+)
+async def test_del_share_user_no_user(mock_get, user, return_value, outlier, caplog):
+    mock_get.return_value = return_value
+
+    with pytest.raises(ValueError) as e:
+        await del_share_user(1000, "test_share", user)
+
+    assert f"[SMB] Attempted to delete user \'{outlier}\' from `test_share` but user not present" in caplog.text
+    assert f"User \'{outlier}\' not present in `test_share`" in str(e.value)
 
 @pytest.mark.asyncio
 @patch("app.core.smb.smb._set_param")

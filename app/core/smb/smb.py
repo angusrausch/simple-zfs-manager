@@ -47,6 +47,7 @@ async def add_share_user(uid: int, share_name: str, users: str | list[str]):
         users = [users]
     for user in users:
         if user in current_users:
+            audit_logger.error(f"[SMB] Attempted to add user \'{user}\' to `{share_name}` but user already present")
             raise ValueError(f"User \'{user}\' already present in share")
         current_users.append(user)
     
@@ -59,8 +60,13 @@ async def del_share_user(uid: int, share_name: str, users: str):
 
     if type(users) == str:
         users = [users]
-    for user in users:
-        current_users.remove(user)
+    
+    try:
+        for user in users:
+            current_users.remove(user)
+    except ValueError:
+        audit_logger.error(f"[SMB] Attempted to delete user \'{user}\' from `{share_name}` but user not present")
+        raise ValueError(f"User \'{user}\' not present in `{share_name}`")
 
     users_str = ", ".join(current_users)
     await _set_param(uid, share_name, "valid users", users_str)
