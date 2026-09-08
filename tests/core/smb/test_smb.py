@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch
 from pathlib import Path
 
-from app.core.smb.smb import list_shares, get_share, create_share, _get_param, _set_param, add_share_user, del_share_user, _execute_smb_command, set_share_browseable, get_share_browseable, set_share_guest_ok, get_share_guest_ok, set_share_read_only, get_share_read_only, get_share_path, set_share_path, delete_share
+from app.core.smb.smb import list_shares, get_share, create_share, _get_param, _set_param, add_share_user, del_share_user, _execute_smb_command, set_share_browseable, get_share_browseable, set_share_guest_ok, get_share_guest_ok, set_share_read_only, get_share_read_only, get_share_path, set_share_path, delete_share, import_shares
 from app.core.smb.models import SmbShare
 
 @pytest.mark.asyncio
@@ -86,6 +86,7 @@ async def test_execute_smb_command_custom_return(mock_run, return_code, return_m
 
 @pytest.mark.asyncio
 @patch("app.core.smb.smb._execute_smb_command")
+@patch("app.core.smb.smb.Path.exists")
 @pytest.mark.parametrize(
     "share_name, share_path, writable, guest_ok",
     [
@@ -96,8 +97,10 @@ async def test_execute_smb_command_custom_return(mock_run, return_code, return_m
         ("test", "/test/path", True, True),
     ]
 )
-async def test_create_share(mock_run, share_name, share_path, writable, guest_ok):
-    assert await create_share(1000, share_name, share_path, writable, guest_ok) == None
+async def test_create_share(mock_exists, mock_run, share_name, share_path, writable, guest_ok):
+    mock_exists.return_value = True
+
+    assert await create_share(1000, share_name, Path(share_path), writable, guest_ok) == None
     
     if writable:
         writeable_param = "writeable=y"
@@ -111,6 +114,18 @@ async def test_create_share(mock_run, share_name, share_path, writable, guest_ok
 
     mock_run.assert_called_once()
     mock_run.assert_called_with(1000, ["addshare", share_name, share_path, writeable_param, guest_ok_param], share_name)
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb.Path.exists")
+async def test_create_share_path_no_exists(mock_exists ,caplog):
+    mock_exists.return_value = False
+
+    with pytest.raises(FileNotFoundError) as e:
+        await create_share(1000, "share_name", Path("/test_path"), False, False)
+
+    assert "Path does not exist. Please choose a different path or create this path and try again" in str(e.value)
+    assert f"[CMD] Share path does not exist: /test_path" in caplog.text
 
 
 @pytest.mark.asyncio
@@ -298,13 +313,14 @@ async def test_set_share_path(mock_exists, mock_execute):
 
 @pytest.mark.asyncio
 @patch("app.core.smb.smb.Path.exists")
-async def test_set_share_path_no_exists(mock_exists):
+async def test_set_share_path_no_exists(mock_exists, caplog):
     mock_exists.return_value = False
 
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(FileNotFoundError) as e:
         await set_share_path(1000, "test_share", Path("/tank/turret"))
 
     assert "Path does not exist. Please choose a different path or create this path and try again" in str(e.value)
+    assert "[CMD] Share path does not exist: /tank/turret" in caplog.text
 
 
 @pytest.mark.asyncio
@@ -314,3 +330,27 @@ async def test_delete_share(mock_execute):
 
     mock_execute.assert_called_once()
     mock_execute.assert_called_with(1000, ["delshare", "test_share"], "test_share")
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb._execute_smb_command")
+@patch("app.core.smb.smb.Path.is_file")
+async def test_mport_shares_path(mock_exists, mock_execute):
+    mock_exists.return_value = True
+
+    assert await import_shares(1000, Path("shares.cfg")) is None
+
+    mock_execute.assert_called_once()
+    mock_execute.assert_called_with(1000, ["import", Path("shares.cfg")])
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb.Path.exists")
+async def test_import_shares_no_exists(mock_exists, caplog):
+    mock_exists.return_value = False
+
+    with pytest.raises(FileNotFoundError) as e:
+        await import_shares(1000, Path("shares.cfg"))
+
+    assert "File does not exist" in str(e.value)
+    assert "[CMD] Import file path does not exist: shares.cfg" in caplog.text

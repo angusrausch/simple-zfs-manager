@@ -36,6 +36,9 @@ async def create_share(uid: int, share_name: str, share_path: Path, writeable: b
     writeable_param = "writeable=y" if writeable else "writeable=n"
     guest_ok_param = "guest_ok=y" if guest_ok else "guest_ok=n"
     safe_path = sanitise_path(share_path)
+    if not safe_path.exists():
+        audit_logger.error(f"[CMD] Share path does not exist: {safe_path}")
+        raise FileNotFoundError("Path does not exist. Please choose a different path or create this path and try again")
     
     command = ["addshare", share_name, str(safe_path), writeable_param, guest_ok_param]
 
@@ -122,9 +125,18 @@ async def get_share_path(uid: int, share_name: str) -> Path:
 async def set_share_path(uid: int, share_name: str, path: Path):
     path = sanitise_path(path)
     if not path.exists():
-        raise ValueError("Path does not exist. Please choose a different path or create this path and try again")
+        audit_logger.error(f"[CMD] Share path does not exist: {path}")
+        raise FileNotFoundError("Path does not exist. Please choose a different path or create this path and try again")
 
     await _set_param(uid, share_name, "path", str(path))
+
+
+async def import_shares(uid: int, config_path: Path):
+    if not config_path.is_file():
+        audit_logger.error(f"[CMD] Import file path does not exist: {config_path}")
+        raise FileNotFoundError("File does not exist")
+    command = ["import", config_path]
+    await _execute_smb_command(uid, command)
 
 
 async def _get_param(uid: int, share_name: str, param_str:str) -> str:
