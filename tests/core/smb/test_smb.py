@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch
 from pathlib import Path
 
-from app.core.smb.smb import list_shares, get_share, create_share, _get_param, _set_param, add_share_user, del_share_user, _execute_smb_command, set_share_browseable, get_share_browseable, set_share_guest_ok, get_share_guest_ok, set_share_read_only, get_share_read_only, get_share_path, set_share_path
+from app.core.smb.smb import list_shares, get_share, create_share, _get_param, _set_param, add_share_user, del_share_user, _execute_smb_command, set_share_browseable, get_share_browseable, set_share_guest_ok, get_share_guest_ok, set_share_read_only, get_share_read_only, get_share_path, set_share_path, delete_share
 from app.core.smb.models import SmbShare
 
 @pytest.mark.asyncio
@@ -305,3 +305,12 @@ async def test_set_share_path_no_exists(mock_exists):
         await set_share_path(1000, "test_share", Path("/tank/turret"))
 
     assert "Path does not exist. Please choose a different path or create this path and try again" in str(e.value)
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb._execute_smb_command")
+async def test_delete_share(mock_execute):
+    assert await delete_share(1000, "test_share") is None
+
+    mock_execute.assert_called_once()
+    mock_execute.assert_called_with(1000, ["delshare", "test_share"], "test_share")

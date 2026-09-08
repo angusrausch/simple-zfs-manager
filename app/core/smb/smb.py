@@ -42,6 +42,11 @@ async def create_share(uid: int, share_name: str, share_path: Path, writeable: b
     await _execute_smb_command(uid, command, share_name)
 
 
+async def delete_share(uid: int, share_name: str):
+    command = ["delshare", share_name]
+    await _execute_smb_command(uid, command, share_name)
+
+
 async def add_share_user(uid: int, share_name: str, users: str | list[str]):
     current_users = _build_smb_users(await _get_param(uid, share_name, "valid users"))
 
