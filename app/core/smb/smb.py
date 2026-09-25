@@ -139,6 +139,22 @@ async def import_shares(uid: int, config_path: Path):
     await _execute_smb_command(uid, command)
 
 
+async def set_timemachine(uid: int, share_name: str):
+    # This is all the settings required to make timemachine on MacOS work
+    share_params = [
+        ("vfs objects", "catia fruit streams_xattr"),
+        ("fruit:time machine", "yes"),
+        ("fruit:metadata", "stream"),
+        ("fruit:model", "MacSamba"),
+        ("fruit:encoding", "native"),
+        ("fruit:locking", "netatalk"),
+        ("fruit:resource", "file")
+    ]
+    
+    for share_param in share_params:
+        await _set_param(uid, share_name, share_param[0], share_param[1])
+
+
 async def _get_param(uid: int, share_name: str, param_str:str) -> str:
     command = ["getparm", share_name, param_str]
 

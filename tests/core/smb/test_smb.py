@@ -1,8 +1,8 @@
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, call
 from pathlib import Path
 
-from app.core.smb.smb import list_shares, get_share, create_share, _get_param, _set_param, add_share_user, del_share_user, _execute_smb_command, set_share_browseable, get_share_browseable, set_share_guest_ok, get_share_guest_ok, set_share_read_only, get_share_read_only, get_share_path, set_share_path, delete_share, import_shares
+from app.core.smb.smb import list_shares, get_share, create_share, _get_param, _set_param, add_share_user, del_share_user, _execute_smb_command, set_share_browseable, get_share_browseable, set_share_guest_ok, get_share_guest_ok, set_share_read_only, get_share_read_only, get_share_path, set_share_path, delete_share, import_shares, set_timemachine
 from app.core.smb.models import SmbShare
 
 @pytest.mark.asyncio
@@ -354,3 +354,21 @@ async def test_import_shares_no_exists(mock_exists, caplog):
 
     assert "File does not exist" in str(e.value)
     assert "[CMD] Import file path does not exist: shares.cfg" in caplog.text
+
+
+@pytest.mark.asyncio
+@patch("app.core.smb.smb._set_param")
+async def test_set_timemachine(mock_set):
+    await set_timemachine(1000, "test_share")
+
+    assert mock_set.call_count == 7
+
+    assert mock_set.call_args_list == [
+        call(1000, "test_share", "vfs objects", "catia fruit streams_xattr"),
+        call(1000, "test_share", "fruit:time machine", "yes"),
+        call(1000, "test_share", "fruit:metadata", "stream"),
+        call(1000, "test_share", "fruit:model", "MacSamba"),
+        call(1000, "test_share", "fruit:encoding", "native"),
+        call(1000, "test_share", "fruit:locking", "netatalk"),
+        call(1000, "test_share", "fruit:resource", "file")
+    ]
