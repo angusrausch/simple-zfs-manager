@@ -37,7 +37,15 @@ def verify_file_integrity(file_path: Path):
         _safe_write(lock_file_path, file_contents)
 
 
-def write_file(file_path: Path, contents: str):
+def read_file(file_path: Path) -> str:
+    verify_file_integrity(file_path)
+
+    return open(file_path, 'r', encoding="utf-8").read()
+
+
+def write_file(uid: int, file_path: Path, contents: str):
+    audit_logger.info(f"[FILE] File {file_path} edited by {uid}")
+
     old_contents = None
     if file_path.is_file():
         verify_file_integrity(file_path)
