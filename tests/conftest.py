@@ -12,6 +12,8 @@ log_location = current_dir / "tests/log/app.log"
 os.environ["LOG_LOCATION"] = str(log_location)
 lock_file_path = current_dir / "tests/lock-tests/lock"
 os.environ["LOCK_FILE_PATH"] = str(lock_file_path)
+nfs_export_file_path = current_dir / "tests/exports"
+os.environ["NFS_EXPORTS_PATH"] = str(nfs_export_file_path)
 
 from app.main import app
 from app.core.security import get_current_user
@@ -43,6 +45,14 @@ def create_log_dir():
     log_location.parent.mkdir(exist_ok=True)
     yield
     shutil.rmtree(log_location.parent)
+
+
+@pytest.fixture(scope="function")
+def create_nfs_export_file():
+    nfs_export_file_path.touch()
+    yield
+    shutil.rmtree(lock_file_path.parent)
+    nfs_export_file_path.unlink()
 
 
 @pytest.fixture(scope="function")

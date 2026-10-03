@@ -19,7 +19,7 @@ class Settings:
     SUDO_BINARY: str = os.getenv("SUDO_BINARY_PATH", "/usr/bin/sudo")
     NET_BINARY: str = os.getenv("NET_BINARY_PATH", "/usr/bin/net")
 
-    NFS_EXPORTS: str = os.getenv("NFS_EXPORTS_PATH", "/etc/exports")
+    NFS_EXPORTS: str = Path(os.getenv("NFS_EXPORTS_PATH", "/etc/exports"))
     
     LOG_LOCATION: Path = Path(os.getenv("LOG_LOCATION", "/var/log/simple-zfs-viewer.log"))
     LOG_LOCATION.parent.mkdir(parents=True, exist_ok=True)

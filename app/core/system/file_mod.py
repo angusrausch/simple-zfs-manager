@@ -78,6 +78,12 @@ def write_file(uid: int, file_path: Path, contents: str):
     verify_file_integrity(file_path)
 
 
+def add_file_line(uid: int, file_path: Path, contents: str):
+    file_contents = read_file(file_path)
+    file_contents += "\n" + contents
+    write_file(uid, file_path, file_contents)
+
+
 def check_all_locks() -> [Path]:
     mismatch_files = []
     for lock_file in settings.LOCK_FILE_PATH.rglob("*"):

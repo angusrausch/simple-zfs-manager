@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from app.core.config import settings
-from app.core.system.file_mod import read_file, write_file
+from app.core.system.file_mod import read_file, add_file_line
 from app.core.nfs.models import NfsShare, NfsHost
 
 async def read_shares(uid: int) -> list[NfsShare]:
@@ -14,6 +14,11 @@ async def read_shares(uid: int) -> list[NfsShare]:
         line = line.strip()
         if line[0] != "#" and len(line) != 0:
             nfs_shares.append(_create_nfs_model(line))
+
+
+async def add_share(uid: int, share_path: Path, hosts: list[str, list[str]]):
+    share_line = _create_nfs_shares_line(share_path, hosts)
+    add_file_line(uid, settings.NFS_EXPORTS, share_line)
 
 
 def _create_nfs_shares_line(share_path: Path, hosts: list[(str, list[str])]):
