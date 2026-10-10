@@ -45,18 +45,6 @@ async def _find_share_line(share: NfsShare, lines: list[str]) -> int:
     raise NFSShareNotFoundError.log_and_raise(f"No matching share found for \"{_create_nfs_shares_line(share)}\"")
 
 
-def _create_nfs_shares_line(share_path: Path, hosts: list[(str, list[str])]):
-    formatted_hosts = []
-    for host in hosts:
-        hostname = host[0]
-        options = host[1]
-        formatted_hosts.append(
-                f"{hostname}({",".join(options)})"
-            )
-
-    return f"{share_path} {" ".join(formatted_hosts)}"
-
-
 def _create_nfs_shares_line(share: NfsShare):
     formatted_hosts = [f"{host.host}({",".join(host.options)})" for host in share.hosts]
     return f"{share.path} {" ".join(formatted_hosts)}"
