@@ -49,6 +49,8 @@ def create_log_dir():
 
 @pytest.fixture(scope="function")
 def create_nfs_export_file():
+    shutil.rmtree(lock_file_path.parent, ignore_errors=True)
+    nfs_export_file_path.unlink(missing_ok=True)
     nfs_export_file_path.touch()
     yield
     shutil.rmtree(lock_file_path.parent)

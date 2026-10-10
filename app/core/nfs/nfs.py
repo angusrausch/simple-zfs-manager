@@ -35,6 +35,16 @@ async def delete_share(uid: int, share: NfsShare):
     write_file(uid, settings.NFS_EXPORTS, new_contents)
 
 
+async def edit_share(uid: int, share: Share, new_share: Share):
+    file_contents = read_file(settings.NFS_EXPORTS)
+    lines = file_contents.splitlines()
+
+    share_line_index = await _find_share_line(share, lines) 
+    lines[share_line_index] = _create_nfs_shares_line(new_share)
+    new_contents = "\n".join(lines) + "\n" if lines else ""
+    write_file(uid, settings.NFS_EXPORTS, new_contents)
+
+
 async def _find_share_line(share: NfsShare, lines: list[str]) -> int:
     for index, line in enumerate(lines):
         line = line.strip()
