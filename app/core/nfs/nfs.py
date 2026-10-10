@@ -12,8 +12,10 @@ async def read_shares(uid: int) -> list[NfsShare]:
     nfs_shares = []
     for line in lines:
         line = line.strip()
-        if line[0] != "#" and len(line) != 0:
+        if len(line) != 0 and line[0] != "#":
             nfs_shares.append(_create_nfs_model(line))
+    
+    return nfs_shares
 
 
 async def add_share(uid: int, share_path: Path, hosts: list[str, list[str]]):

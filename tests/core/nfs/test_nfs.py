@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
 
-from app.core.nfs.nfs import _create_nfs_shares_line, _create_nfs_model, add_share
+from app.core.nfs.nfs import _create_nfs_shares_line, _create_nfs_model, add_share, read_shares
 from app.core.nfs.models import NfsShare, NfsHost
 from app.core.config import settings
 
@@ -52,3 +52,25 @@ async def test_add_share(create_nfs_export_file):
 
     await add_share(1000, share_path, hosts)
     assert open(settings.NFS_EXPORTS).read() == "\n" + share_line + "\n" + share_line
+
+
+@pytest.mark.asyncio
+async def test_read_shares(create_nfs_export_file):
+    contents = """
+# Comment
+/tank/turret 10.0.0.1(rw,sync,no_subtree_check)
+/tank/track 10.0.0.0/24(ro,sync,no_subtree_check)
+# Another Comment
+/tanks/shell 10.0.0.1(ro,sync,no_subtree_check) 10.0.0.10(rw,sync,no_subtree_check)
+        """
+    open(settings.NFS_EXPORTS, 'w').write(contents)
+
+    shares = await read_shares(1000)
+
+    expected_shares = [
+            _create_nfs_model("/tank/turret 10.0.0.1(rw,sync,no_subtree_check)"),
+            _create_nfs_model("/tank/track 10.0.0.0/24(ro,sync,no_subtree_check)"),
+            _create_nfs_model("/tanks/shell 10.0.0.1(ro,sync,no_subtree_check) 10.0.0.10(rw,sync,no_subtree_check)")
+        ]
+
+    assert shares == expected_shares
